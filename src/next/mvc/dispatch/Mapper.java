@@ -14,7 +14,7 @@ import next.mvc.annotation.After;
 import next.mvc.annotation.Before;
 import next.mvc.annotation.HttpMethod;
 import next.mvc.annotation.HttpMethods;
-import next.mvc.annotation.UriRouter;
+import next.mvc.annotation.Router;
 import next.mvc.annotation.When;
 import next.mvc.http.Http;
 import next.mvc.http.Store;
@@ -41,7 +41,7 @@ public class Mapper {
 
 	Mapper() throws TypeDuplicateException {
 		instancePool = new InstancePool(Setting.getMapping().getBasePackage());
-		instancePool.addClassAnnotations(UriRouter.class, HttpMethods.class, ParameterInject.class);
+		instancePool.addClassAnnotations(Router.class, HttpMethods.class, ParameterInject.class);
 		instancePool.addMethodAnnotations(When.class, HttpMethod.class);
 		instancePool.build();
 

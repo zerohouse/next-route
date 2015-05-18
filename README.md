@@ -1,4 +1,4 @@
-# Next MVC Library 0.0.1
+# Next Route Library 0.0.1 (MVC)
 편합니다!
 
 
@@ -8,7 +8,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 ###Repository
     <repository>
         <id>next-mvn-repo</id>
-    	<url>https://raw.github.com/zerohouse/next/mvn-repo/</url>
+        <url>https://raw.github.com/zerohouse/next/mvn-repo/</url>
 	</repository>
 
 ###Dependency
@@ -23,17 +23,18 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 
 ## Example Usage
 
-    @Controller
-    @Mapping(value="/api/user", before="loginCheck")
+    @Router
+    @When("/api/user")
+    @Before("loginCheck")
 	public class UserController {
 		@Build
 		GDAO<User> userDAO;
 	
-		@Build
-		@ImplementedBy(DeleteRight.class)
+		@Build(ImplementedBy=DeleteRight.class)
 		Right right;
 		
-		@Mapping(value = "/login", method = Method.POST, before="!loginCheck")
+		@When(value = "/login", method = Methods.POST)
+        @Before("!loginCheck")
 		public Response login(@JsonParameter("user") User user, HttpSession session) {
 			User fromDB = userDao.find(user.getEmail());
 			if (fromDB == null)
@@ -44,13 +45,16 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 			return new Json(fromDB);
 		}
 	}
+    
+## cf. [Build를 통한 Dependency Inection](https://github.com/zerohouse/next-build)
+## cf. [Mysql Jdbc Library](https://github.com/zerohouse/next-jdbc-mysql)
 
 ## Method Return Type별 응답
 #### 1. Response.class Interface
-
     new Json(JsonObject);
     new Jsp(Jsp파일명);
     new StaticFile(파일명); // webapp/파일
+    new Plain(스트링); //스트링 리턴
     
 #### 2-1. String이 forward:로 시작할때 :뒤의 Path로 forward(클라이언트에서 주소 바뀌지 않음)
 #### 2-2. String이 redirect:로 시작할때, :뒤의 Path로 reidrect(클라이언트 주소 바뀜) 
@@ -68,44 +72,58 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 
 
 ### Annotations
-#### @Controller [클래스 레벨]
-컨트롤러 클래스에 사용
+#### @Router [클래스 레벨]
+라우터 클래스에 선언
 
-#### @Mapping [클래스, 메서드 레벨]
+#### @When [클래스, 메서드 레벨]
 Url 매핑 정보를 정의
 
-    String[] value() default ""; // 매핑될 url들
-	String[] before() default ""; // 해당 메서드를 실행하기 전 실행될 메서드 
-	String[] after() default ""; // 해당 메서드를 실행한 후 실행될 메서드
-	String[] method() default "GET"; // 매핑될 메서드(Post, Get, Put, Delete등) 
+    String[] value() default ""; // 매핑될 url들 ({}, *)
+    String[] method() default "GET"; // 매핑될 메서드(Post, Get, Put, Delete등) 
 	
 ### Uri 변수의 사용
 	모든 파라미터를 받을때 {}와 *를 사용합니다.
-	@Mapping("/{variableName}/*");
+	@Mapping("/{valueName}/*");
      *와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
-	http.getUriVariable("variableName");
-	혹은 파라미터에 @UriVariable("variableName") String uri로 사용가능합니다.
+	http.getUriValue("valueName");
+	혹은 파라미터에 @UriValue("valueName") String uri로 사용가능합니다.
 
 #### @HttpMethods [클래스 레벨]
 @HttpMethod메서드 클래스에 선언.
 
 #### @HttpMethod [메서드 레벨]
-공통적으로 사용할 메서드 정의 @Mapping의 before, after에서 사용
+공통적으로 사용할 메서드 정의 @Before, @After에서 사용
 
     String value() default ""; // 매핑될 이름 값이 없으면 메서드 이름으로 매핑
     
-#### @Parameter, @JsonParameter, @SessionAttribute, @DB(keyParameter="?"), @Stored [파라미터 레벨]
+#### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored [파라미터 레벨]
 
 #### example
-    @Mapping(value = "/update", before = "loginCheck", method = Method.POST)
-    public void updatePost(@Parameter("userId") String parameter,
-     		@FromDB(keyParameter="userId") User user2,
+    @Before("loginCheck")
+    @When(value = "/update", method = Method.POST)
+    public void updatePost(@StringParameter("userId") String parameter,
               @JsonParameter("Post") Post post,
               @SessionAttribute("user") User user, @Stored List<String> mylist) {
               //Stored의 경우
               //Store store를 꺼내 저장한 속성을 뺄 수 있음.
     }
     
+#### 임의의 파라미터를 inject 하고자 할 경우 파라미터 Inject를 임플리먼트한 클래스를 생성
+    @ParameterInject
+    public class HttpInject implements Inject {
+    
+        @Override
+    	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
+    		return http;
+    	}
+    
+    	@Override
+    	public boolean matches(Class<?> type, Parameter obj) {
+    		return type.equals(Http.class);
+    	}
+    
+    }
+
 
 
 ### UploadFile.class
@@ -114,16 +132,16 @@ Url 매핑 정보를 정의
 #### File Upload Example
     
     
-    @Controller
-    @Mapping(value = "/api/upload")
+    @Router
+    @When(value = "/api/upload")
     public class UploadController {
     
         @Build
     	DAO dao;
     
-    	@Mapping(value = "/profilePhoto", method = Method.POST)
+    	@When(value = "/profilePhoto", method = Methods.POST)
     	public Object profile(@SessionAttribute("user") User user,
-            @Parameter("photo") UploadFile file) throws IOException {
+            @FileParameter("photo") UploadFile file) throws IOException {
     		file.setFileName("profile_" + user.getEmail().replace('@', '_'));
     		user.setPhotoUrl(file.getUriPath());
     		file.save();
@@ -139,13 +157,13 @@ HttpImpl.class, HttpForTest.class
 HttpSevlet req와 resp의 Wrapper 클래스, 익셉션제거
 
 #### example
-    @Mapping(method = Method.GET, before="loginCheck")
+    @When(method = Methods.GET, before="loginCheck")
     public void getAnswers(Http http) {
         http.forward("/index")
     }
     
 #### vs 직접 사용 하는 경우
-    @Mapping(method = Method.GET, before="loginCheck")
+    @When(method = Methods.GET, before="loginCheck")
     public void getAnswers(HttpServletRequest req, HttpServletResponse res) {
         RequestDispatcher rd = req.getRequestDispatcher(path);
     	try {
@@ -172,12 +190,12 @@ HttpSevlet req와 resp의 Wrapper 클래스, 익셉션제거
     	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
     	version="3.0">
     	<listener>
-    		<listener-class>next.mvc.Next</listener-class>
+    		<listener-class>next.route.Next</listener-class>
     	</listener>
     </web-app>
 
 
-## next-mvc.json (resources/next-mvc.json)
+## next-route.json (resources/next-route.json)
 ### Setting
 	{
 	  "basePackage": "",

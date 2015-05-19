@@ -80,7 +80,7 @@ public class Mapper {
 	private void makeUriMap() {
 		instancePool.getInstancesAnnotatedWith(Router.class).forEach(router -> {
 			logger.info("\n");
-			logger.info(String.format("Router %s Uri맵을 만듭니다.", router.getClass().getSimpleName()));
+			logger.info(String.format("Router %s Uri를 매핑합니다.", router.getClass().getSimpleName()));
 			Method[] methods = router.getClass().getMethods();
 			for (int i = 0; i < methods.length; i++) {
 				if (methods[i].isAnnotationPresent(When.class))

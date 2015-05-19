@@ -45,7 +45,7 @@ public class Mapper {
 		instancePool.build();
 
 		Set<Inject> set = new HashSet<Inject>();
-		instancePool.getAnnotatedInstance(ParameterInject.class).forEach(inject -> {
+		instancePool.getAnnotatedInstances(ParameterInject.class).forEach(inject -> {
 			set.add((Inject) inject);
 		});
 

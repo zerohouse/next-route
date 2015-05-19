@@ -2,18 +2,11 @@ package next.route.setting;
 
 import java.io.FileReader;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Setting {
 
-	private static Reflections reflections;
 	private static Mapping mapping;
 	private static Gson gson;
 
@@ -25,13 +18,6 @@ public class Setting {
 			e.printStackTrace();
 		}
 		gson = new GsonBuilder().setDateFormat(mapping.getDateFormat()).create();
-		reflections = new Reflections(mapping.getBasePackage(), new SubTypesScanner(), new TypeAnnotationsScanner(), new FieldAnnotationsScanner(),
-				new MethodAnnotationsScanner());
-
-	}
-
-	public static Reflections getReflections() {
-		return reflections;
 	}
 
 	public static Mapping getMapping() {

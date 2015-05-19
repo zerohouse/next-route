@@ -46,7 +46,7 @@ public class Mapper {
 		instancePool.build();
 
 		Set<Inject> set = new HashSet<Inject>();
-		instancePool.getAnnotatedInstances(ParameterInject.class).forEach(inject -> {
+		instancePool.getInstancesAnnotatedWith(ParameterInject.class).forEach(inject -> {
 			set.add((Inject) inject);
 		});
 
@@ -59,22 +59,29 @@ public class Mapper {
 	}
 
 	private void makeMethodMap() {
-		Setting.getReflections().getMethodsAnnotatedWith(HttpMethod.class).forEach(m -> {
-			Object instance = instancePool.getInstance(m.getDeclaringClass());
-			HttpMethod method = m.getAnnotation(HttpMethod.class);
-			String methodName = method.value();
-			if (methodName.equals(""))
-				methodName = m.getName();
-			methodMap.put(methodName, new MethodWrapper(instance, m));
+
+		logger.info("\n");
+		logger.info("HttpMethod를 생성합니다.");
+		instancePool.getInstancesAnnotatedWith(HttpMethod.class).forEach(instance -> {
+			Method[] methods = instance.getClass().getMethods();
+			for (int i = 0; i < methods.length; i++) {
+				if (!methods[i].isAnnotationPresent(HttpMethod.class))
+					continue;
+				HttpMethod method = methods[i].getAnnotation(HttpMethod.class);
+				String methodName = method.value();
+				if (methodName.equals(""))
+					methodName = methods[i].getName();
+				methodMap.put(methodName, new MethodWrapper(instance, methods[i]));
+				logger.info(String.format("[%s] %s", methodName, methods[i]));
+			}
 		});
-		logger.info(String.format("HttpMethod -> %s", methodMap.toString()));
 	}
 
 	private void makeUriMap() {
-		Setting.getReflections().getTypesAnnotatedWith(Router.class).forEach(router -> {
+		instancePool.getInstancesAnnotatedWith(Router.class).forEach(router -> {
 			logger.info("\n");
-			logger.info(String.format("Router %s Uri맵을 만듭니다.", router.getSimpleName()));
-			Method[] methods = router.getMethods();
+			logger.info(String.format("Router %s Uri맵을 만듭니다.", router.getClass().getSimpleName()));
+			Method[] methods = router.getClass().getMethods();
 			for (int i = 0; i < methods.length; i++) {
 				if (methods[i].isAnnotationPresent(When.class))
 					methodMapping(methods[i]);

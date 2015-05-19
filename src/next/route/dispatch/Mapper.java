@@ -8,8 +8,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import next.build.exception.TypeDuplicateException;
-import next.build.instance.InstancePool;
+import next.bind.InstancePool;
 import next.route.annotation.After;
 import next.route.annotation.Before;
 import next.route.annotation.HttpMethod;
@@ -39,7 +38,7 @@ public class Mapper {
 	private InstancePool instancePool;
 	private ParameterMaker parameterMaker;
 
-	Mapper() throws TypeDuplicateException {
+	Mapper() {
 		instancePool = new InstancePool(Setting.getMapping().getBasePackage());
 		instancePool.addClassAnnotations(Router.class, HttpMethods.class, ParameterInject.class);
 		instancePool.addMethodAnnotations(When.class, HttpMethod.class);

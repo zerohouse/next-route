@@ -26,13 +26,8 @@
 		</dependency>
 		<dependency>
 			<groupId>at.begin</groupId>
-			<artifactId>next-build</artifactId>
+			<artifactId>next-bind</artifactId>
 			<version>0.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<version>0.9.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

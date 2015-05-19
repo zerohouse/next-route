@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import next.build.exception.TypeDuplicateException;
 import next.route.http.Http;
 import next.route.http.HttpImpl;
 import next.route.setting.Setting;
@@ -30,11 +29,7 @@ public class Dispatcher extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		try {
-			mapper = new Mapper();
-		} catch (TypeDuplicateException e) {
-			e.printStackTrace();
-		}
+		mapper = new Mapper();
 		CONTEXT_PATH = getServletContext().getRealPath(java.io.File.separator) + java.io.File.separator;
 		ServletRegistration.Dynamic dispatcher = (Dynamic) getServletContext().getServletRegistration("Dispatcher");
 		dispatcher.setMultipartConfig(Setting.getMapping().getUpload().getMultipartConfig());

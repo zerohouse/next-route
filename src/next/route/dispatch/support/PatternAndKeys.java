@@ -6,14 +6,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import next.route.http.Http;
 
 public class PatternAndKeys {
-
-	private static final Logger logger = LoggerFactory.getLogger(PatternAndKeys.class);
 
 	private Pattern pattern;
 	private static final Pattern REGEXPattern;
@@ -36,7 +31,6 @@ public class PatternAndKeys {
 		}
 		String regex = uri.replaceAll(REGEX, "(.*)");
 		pattern = Pattern.compile(regex);
-		logger.debug(String.format("uriMapping -> %s", keys.toString()));
 	}
 
 	public boolean find(String uri, Http http) {

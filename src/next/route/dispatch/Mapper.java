@@ -1,5 +1,6 @@
 package next.route.dispatch;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -70,45 +71,55 @@ public class Mapper {
 	}
 
 	private void makeUriMap() {
-		Setting.getReflections().getMethodsAnnotatedWith(When.class).forEach(m -> {
-			Class<?> declaringClass = m.getDeclaringClass();
-			String[] prefix;
-			Queue<MethodWrapper> methodList = new ConcurrentLinkedQueue<MethodWrapper>();
-			String[] beforeClass = null;
-			String[] afterClass = null;
-			if (declaringClass.isAnnotationPresent(When.class)) {
-				When mapping = declaringClass.getAnnotation(When.class);
-				prefix = mapping.value();
-			} else {
-				prefix = new String[] { "" };
+		Setting.getReflections().getTypesAnnotatedWith(Router.class).forEach(router -> {
+			logger.info("\n");
+			logger.info(String.format("Router %s Uri맵을 만듭니다.", router.getSimpleName()));
+			Method[] methods = router.getMethods();
+			for (int i = 0; i < methods.length; i++) {
+				if (methods[i].isAnnotationPresent(When.class))
+					methodMapping(methods[i]);
 			}
-			if (declaringClass.isAnnotationPresent(Before.class))
-				beforeClass = declaringClass.getAnnotation(Before.class).value();
-			if (declaringClass.isAnnotationPresent(After.class))
-				afterClass = declaringClass.getAnnotation(After.class).value();
-			When mapping = m.getAnnotation(When.class);
-			String[] before = null;
-			String[] after = null;
-			if (m.isAnnotationPresent(Before.class))
-				before = declaringClass.getAnnotation(Before.class).value();
-			if (m.isAnnotationPresent(After.class))
-				after = declaringClass.getAnnotation(After.class).value();
-
-			addAll(methodList, beforeClass);
-			addAll(methodList, before);
-			methodList.add(new MethodWrapper(instancePool.getInstance(declaringClass), m));
-			addAll(methodList, after);
-			addAll(methodList, afterClass);
-			for (int i = 0; i < prefix.length; i++)
-				for (int j = 0; j < mapping.method().length; j++)
-					for (int k = 0; k < mapping.value().length; k++) {
-						String method = mapping.method()[j];
-						String uri = prefix[i] + mapping.value()[k];
-						UriKey urikey = new UriKey(method, uri);
-						uriMap.put(urikey, methodList);
-						logger.info(String.format("Mapping : %s -> %s", urikey.toString(), methodList.toString()));
-					}
 		});
+	}
+
+	private void methodMapping(Method m) {
+		Class<?> declaringClass = m.getDeclaringClass();
+		String[] prefix;
+		Queue<MethodWrapper> methodList = new ConcurrentLinkedQueue<MethodWrapper>();
+		String[] beforeClass = null;
+		String[] afterClass = null;
+		if (declaringClass.isAnnotationPresent(When.class)) {
+			When mapping = declaringClass.getAnnotation(When.class);
+			prefix = mapping.value();
+		} else {
+			prefix = new String[] { "" };
+		}
+		if (declaringClass.isAnnotationPresent(Before.class))
+			beforeClass = declaringClass.getAnnotation(Before.class).value();
+		if (declaringClass.isAnnotationPresent(After.class))
+			afterClass = declaringClass.getAnnotation(After.class).value();
+		When mapping = m.getAnnotation(When.class);
+		String[] before = null;
+		String[] after = null;
+		if (m.isAnnotationPresent(Before.class))
+			before = declaringClass.getAnnotation(Before.class).value();
+		if (m.isAnnotationPresent(After.class))
+			after = declaringClass.getAnnotation(After.class).value();
+
+		addAll(methodList, beforeClass);
+		addAll(methodList, before);
+		methodList.add(new MethodWrapper(instancePool.getInstance(declaringClass), m));
+		addAll(methodList, after);
+		addAll(methodList, afterClass);
+		for (int i = 0; i < prefix.length; i++)
+			for (int j = 0; j < mapping.method().length; j++)
+				for (int k = 0; k < mapping.value().length; k++) {
+					String method = mapping.method()[j];
+					String uri = prefix[i] + mapping.value()[k];
+					UriKey urikey = new UriKey(method, uri);
+					uriMap.put(urikey, methodList);
+					logger.info(String.format("%s -> %s", urikey.toString(), methodList.toString()));
+				}
 	}
 
 	private void addAll(Queue<MethodWrapper> methodList, String[] stringArray) {

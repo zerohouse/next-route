@@ -19,7 +19,7 @@ public class Methods {
 
 	@Override
 	public String toString() {
-		return "methodList [" + methodList + "], factory=" + factory.getClass().getSimpleName();
+		return methodList + ", default=" + factory.getClass().getSimpleName();
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Methods.class);

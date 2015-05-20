@@ -71,15 +71,17 @@ public class Mapper {
 	}
 
 	private void makeUriMap() {
-		instancePool.getInstancesAnnotatedWith(Router.class).forEach(router -> {
-			logger.info("\n");
-			logger.info(String.format("Router %s Uri를 매핑합니다.", router.getClass().getSimpleName()));
-			Method[] methods = router.getClass().getMethods();
-			for (int i = 0; i < methods.length; i++) {
-				if (methods[i].isAnnotationPresent(When.class))
-					methodMapping(methods[i]);
-			}
-		});
+		instancePool.getInstancesAnnotatedWith(Router.class).forEach(
+				router -> {
+					logger.info("\n");
+					logger.info(String.format("Router %s Uri를 매핑합니다. Default:%s", router.getClass().getSimpleName(),
+							router.getClass().getAnnotation(Router.class).defaultFactory().getSimpleName()));
+					Method[] methods = router.getClass().getMethods();
+					for (int i = 0; i < methods.length; i++) {
+						if (methods[i].isAnnotationPresent(When.class))
+							methodMapping(methods[i]);
+					}
+				});
 	}
 
 	private void methodMapping(Method m) {

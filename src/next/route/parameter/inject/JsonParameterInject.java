@@ -15,7 +15,7 @@ public class JsonParameterInject implements Inject {
 		String name = jparam.value();
 		Object value = http.getJsonObject(type, name);
 		if (jparam.require() && value == null)
-			throw new RequiredParamNullException(jparam.errorWhenParamNull());
+			throw new RequiredParamNullException(jparam.messageWhenNull());
 		return value;
 	}
 

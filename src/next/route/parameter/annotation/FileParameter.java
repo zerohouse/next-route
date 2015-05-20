@@ -21,5 +21,5 @@ public @interface FileParameter {
 
 	boolean require() default true;
 
-	String errorWhenParamNull() default PARAM_NULL;
+	String messageWhenNull() default PARAM_NULL;
 }

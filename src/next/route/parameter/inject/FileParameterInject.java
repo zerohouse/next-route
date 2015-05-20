@@ -22,7 +22,7 @@ public class FileParameterInject implements Inject {
 		else if (type.equals(Part.class))
 			value = http.getPart(name);
 		if (param.require() && value == null)
-			throw new RequiredParamNullException(param.errorWhenParamNull());
+			throw new RequiredParamNullException(param.messageWhenNull());
 		return value;
 	}
 

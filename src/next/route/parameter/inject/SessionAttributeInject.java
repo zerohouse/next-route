@@ -15,7 +15,7 @@ public class SessionAttributeInject implements Inject {
 		String name = session.value();
 		Object value = http.getSessionAttribute(Object.class, name);
 		if (session.require() && value == null)
-			throw new RequiredParamNullException(session.errorWhenSessionNull());
+			throw new RequiredParamNullException(session.messageWhenNull());
 		return value;
 	}
 

@@ -19,5 +19,5 @@ public @interface SessionAttribute {
 
 	boolean require() default true;
 
-	String errorWhenSessionNull() default SESSION_NULL;
+	String messageWhenNull() default SESSION_NULL;
 }

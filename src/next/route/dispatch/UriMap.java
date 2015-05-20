@@ -13,22 +13,22 @@ import next.route.http.Http;
 
 public class UriMap {
 
-	private Map<UriKey, Queue<MethodWrapper>> uriMap;
+	private Map<UriKey, Methods> uriMap;
 	private Map<String, Queue<PatternAndKeys>> regexMap;
-	private Map<PatternAndKeys, Queue<MethodWrapper>> patternMap;
+	private Map<PatternAndKeys, Methods> patternMap;
 	private final Pattern pattern;
 
 	public UriMap() {
-		uriMap = new ConcurrentHashMap<UriKey, Queue<MethodWrapper>>();
+		uriMap = new ConcurrentHashMap<UriKey, Methods>();
 		regexMap = new ConcurrentHashMap<String, Queue<PatternAndKeys>>();
-		patternMap = new ConcurrentHashMap<PatternAndKeys, Queue<MethodWrapper>>();
+		patternMap = new ConcurrentHashMap<PatternAndKeys, Methods>();
 		pattern = Pattern.compile(PatternAndKeys.REGEX);
 	}
 
-	public void put(UriKey key, Queue<MethodWrapper> methodList) {
+	public void put(UriKey key, Methods Methods) {
 		Matcher matcher = pattern.matcher(key.getUri());
 		if (!key.getUri().contains("*") && !matcher.find()) {
-			uriMap.put(key, methodList);
+			uriMap.put(key, Methods);
 			return;
 		}
 		Queue<PatternAndKeys> regexList = regexMap.get(key.getMethod());
@@ -38,13 +38,13 @@ public class UriMap {
 		}
 		PatternAndKeys pak = new PatternAndKeys(key.getUri());
 		regexList.add(pak);
-		patternMap.put(pak, methodList);
+		patternMap.put(pak, Methods);
 	}
 
-	public Queue<MethodWrapper> get(UriKey key, Http http) {
-		Queue<MethodWrapper> methodArray = uriMap.get(key);
-		if (methodArray != null)
-			return methodArray;
+	public Methods get(UriKey key, Http http) {
+		Methods methods = uriMap.get(key);
+		if (methods != null)
+			return methods;
 		Queue<PatternAndKeys> regexList = regexMap.get(key.getMethod());
 		if (regexList == null)
 			return null;
@@ -52,8 +52,8 @@ public class UriMap {
 		while (keys.hasNext()) {
 			PatternAndKeys pak = keys.next();
 			if (pak.find(key.getUri(), http)) {
-				methodArray = patternMap.get(pak);
-				return methodArray;
+				methods = patternMap.get(pak);
+				return methods;
 			}
 		}
 		return null;

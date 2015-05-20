@@ -7,13 +7,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import next.bind.InstancePool;
-import next.route.annotation.After;
-import next.route.annotation.Before;
 import next.route.annotation.HttpMethod;
-import next.route.annotation.HttpMethods;
 import next.route.annotation.Router;
 import next.route.annotation.When;
 import next.route.http.Http;
@@ -21,8 +17,6 @@ import next.route.http.Store;
 import next.route.parameter.ParameterMaker;
 import next.route.parameter.annotation.ParameterInject;
 import next.route.parameter.inject.Inject;
-import next.route.response.Json;
-import next.route.response.Plain;
 import next.route.response.Response;
 import next.route.setting.Setting;
 
@@ -41,7 +35,7 @@ public class Mapper {
 
 	Mapper() {
 		instancePool = new InstancePool(Setting.getMapping().getBasePackage());
-		instancePool.addClassAnnotations(Router.class, HttpMethods.class, ParameterInject.class);
+		instancePool.addClassAnnotations(Router.class, ParameterInject.class);
 		instancePool.addMethodAnnotations(When.class, HttpMethod.class);
 		instancePool.build();
 
@@ -59,7 +53,6 @@ public class Mapper {
 	}
 
 	private void makeMethodMap() {
-
 		logger.info("\n");
 		logger.info("HttpMethod를 생성합니다.");
 		instancePool.getInstancesAnnotatedWith(HttpMethod.class).forEach(instance -> {
@@ -92,80 +85,33 @@ public class Mapper {
 	private void methodMapping(Method m) {
 		Class<?> declaringClass = m.getDeclaringClass();
 		String[] prefix;
-		Queue<MethodWrapper> methodList = new ConcurrentLinkedQueue<MethodWrapper>();
-		String[] beforeClass = null;
-		String[] afterClass = null;
+		Methods methods = new Methods(m, methodMap, instancePool);
 		if (declaringClass.isAnnotationPresent(When.class)) {
-			When mapping = declaringClass.getAnnotation(When.class);
-			prefix = mapping.value();
+			prefix = declaringClass.getAnnotation(When.class).value();
 		} else {
 			prefix = new String[] { "" };
 		}
-		if (declaringClass.isAnnotationPresent(Before.class))
-			beforeClass = declaringClass.getAnnotation(Before.class).value();
-		if (declaringClass.isAnnotationPresent(After.class))
-			afterClass = declaringClass.getAnnotation(After.class).value();
 		When mapping = m.getAnnotation(When.class);
-		String[] before = null;
-		String[] after = null;
-		if (m.isAnnotationPresent(Before.class))
-			before = declaringClass.getAnnotation(Before.class).value();
-		if (m.isAnnotationPresent(After.class))
-			after = declaringClass.getAnnotation(After.class).value();
-
-		addAll(methodList, beforeClass);
-		addAll(methodList, before);
-		methodList.add(new MethodWrapper(instancePool.getInstance(declaringClass), m));
-		addAll(methodList, after);
-		addAll(methodList, afterClass);
 		for (int i = 0; i < prefix.length; i++)
 			for (int j = 0; j < mapping.method().length; j++)
 				for (int k = 0; k < mapping.value().length; k++) {
 					String method = mapping.method()[j];
 					String uri = prefix[i] + mapping.value()[k];
 					UriKey urikey = new UriKey(method, uri);
-					uriMap.put(urikey, methodList);
-					logger.info(String.format("%s -> %s", urikey.toString(), methodList.toString()));
+					uriMap.put(urikey, methods);
+					logger.info(String.format("%s -> %s", urikey, methods));
 				}
-	}
-
-	private void addAll(Queue<MethodWrapper> methodList, String[] stringArray) {
-		if (stringArray == null)
-			return;
-		for (int i = 0; i < stringArray.length; i++) {
-			if (stringArray[i].equals(""))
-				continue;
-			MethodWrapper method;
-			if (stringArray[i].charAt(0) == '!') {
-				method = methodMap.get(stringArray[i].substring(1));
-				if (method == null) {
-					logger.warn(String.format("없는 Method [%s]를 제외하려고 했습니다.", stringArray[i]));
-					continue;
-				}
-
-				if (!methodList.contains(method)) {
-					logger.warn(String.format("실행할 메소드리스트에 추가되지 않은 Method [%s]를 제외하려고 했습니다.", stringArray[i]));
-					continue;
-				}
-				methodList.remove(method);
-			}
-			method = methodMap.get(stringArray[i]);
-			if (method == null) {
-				logger.warn(String.format("없는 Method [%s]를 매핑하려고 했습니다.", stringArray[i]));
-				continue;
-			}
-			methodList.add(methodMap.get(stringArray[i]));
-		}
 	}
 
 	public void execute(UriKey url, Http http) {
-		Queue<MethodWrapper> methods = uriMap.get(url, http);
-		if (methods == null) {
+		Methods methods = uriMap.get(url, http);
+		Queue<MethodWrapper> methodList = methods.getMethodList();
+		if (methodList == null) {
 			http.sendError(404);
 			return;
 		}
-		logger.debug(String.format("%s -> %s", url, methods.toString()));
-		Iterator<MethodWrapper> miter = methods.iterator();
+		logger.debug(String.format("%s -> %s", url, methodList.toString()));
+		Iterator<MethodWrapper> miter = methodList.iterator();
 		Store store = new Store(); // 생각을 좀 해봅시다..ㅇㅅㅇ;;
 		try {
 			while (miter.hasNext()) {
@@ -182,12 +128,12 @@ public class Mapper {
 					if (stringResponse(http, returned))
 						return;
 				}
-				new Json(returned).render(http);
+				methods.getResponse(returned).render(http);
 				return;
 			}
-			new Json().render(http);
+			methods.getResponse(null).render(http);
 		} catch (Exception e) {
-			new Plain(e.getMessage()).render(http);
+			methods.getResponse(e.getMessage()).render(http);
 		}
 	}
 

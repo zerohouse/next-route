@@ -6,9 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import next.route.http.Http;
 import next.route.http.Store;
-import next.route.parameter.annotation.ParameterInject;
 
-@ParameterInject
 public class HttpServletResponseInject implements Inject {
 
 	@Override

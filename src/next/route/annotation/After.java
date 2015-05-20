@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 
  * 지정된 메소드들을 실행 후 실행합니다.<br>
- * HttpMethod로 지정된 메소드를 실행가능합니다.
+ * HttpMethod로 지정된 메소드를 실행합니다.
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

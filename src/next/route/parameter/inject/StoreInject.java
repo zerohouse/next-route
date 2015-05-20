@@ -4,9 +4,7 @@ import java.lang.reflect.Parameter;
 
 import next.route.http.Http;
 import next.route.http.Store;
-import next.route.parameter.annotation.ParameterInject;
 
-@ParameterInject
 public class StoreInject implements Inject {
 
 	@Override

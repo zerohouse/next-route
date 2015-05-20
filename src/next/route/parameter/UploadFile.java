@@ -9,6 +9,11 @@ import javax.servlet.http.Part;
 import next.route.dispatch.Dispatcher;
 import next.route.setting.Setting;
 
+/**
+ * 
+ * 업로드한 파일을 받습니다.
+ * 
+ */
 public class UploadFile implements Part {
 
 	Part part;

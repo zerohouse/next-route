@@ -9,9 +9,7 @@ import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.UploadFile;
 import next.route.parameter.annotation.FileParameter;
-import next.route.parameter.annotation.ParameterInject;
 
-@ParameterInject
 public class FileParameterInject implements Inject {
 
 	@Override

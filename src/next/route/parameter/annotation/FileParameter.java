@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * request의 파라미터를 사용합니다.<br>
- * String으로 사용합니다.<br>
+ * File으로 사용합니다.<br>
  * require일 경우, 해당 오브젝트가 없으면 에러를 발생시킵니다.
  * 
  */

@@ -16,7 +16,18 @@ import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.ParameterMaker;
 import next.route.parameter.annotation.ParameterInject;
+import next.route.parameter.inject.FileParameterInject;
+import next.route.parameter.inject.HttpInject;
+import next.route.parameter.inject.HttpServletRequestInject;
+import next.route.parameter.inject.HttpServletResponseInject;
+import next.route.parameter.inject.HttpSessionInject;
 import next.route.parameter.inject.Inject;
+import next.route.parameter.inject.JsonParameterInject;
+import next.route.parameter.inject.SessionAttributeInject;
+import next.route.parameter.inject.StoreInject;
+import next.route.parameter.inject.StoredInject;
+import next.route.parameter.inject.StringParameterInject;
+import next.route.parameter.inject.UriValueInject;
 import next.route.response.Response;
 import next.route.setting.Setting;
 
@@ -40,6 +51,17 @@ public class Mapper {
 		instancePool.build();
 
 		Set<Inject> set = new HashSet<Inject>();
+		set.add(new FileParameterInject());
+		set.add(new HttpInject());
+		set.add(new HttpServletRequestInject());
+		set.add(new HttpServletResponseInject());
+		set.add(new HttpSessionInject());
+		set.add(new JsonParameterInject());
+		set.add(new SessionAttributeInject());
+		set.add(new StoredInject());
+		set.add(new StoreInject());
+		set.add(new StringParameterInject());
+		set.add(new UriValueInject());
 		instancePool.getInstancesAnnotatedWith(ParameterInject.class).forEach(inject -> {
 			set.add((Inject) inject);
 		});

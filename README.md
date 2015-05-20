@@ -9,7 +9,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
     <repository>
         <id>next-mvn-repo</id>
         <url>https://raw.github.com/zerohouse/next/mvn-repo/</url>
-	</repository>
+    </repository>
 
 ###Dependency
 	<dependency>
@@ -46,9 +46,6 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 		}
 	}
     
-## cf. [Build를 통한 Dependency Inection](https://github.com/zerohouse/next-build)
-## cf. [Mysql Jdbc Library](https://github.com/zerohouse/next-jdbc-mysql)
-
 ## Method Return Type별 응답
 #### 1. Response.class Interface
     new Json(JsonObject);
@@ -64,16 +61,26 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 	return "redirect:/index.html" // redirect to : /index.html 
 	return "error:404" // 404에러 리턴
 	return "error:404:페이지가 없습니다." // 404에러 리턴 + 에러메시지 리턴
-#### 4. Object Return시 new Json(Object)로 간주 JSON으로 응답함.
-	ex)
-	return "/index.html" // JsonObject Return {"response":"/index.html"}
-#### 5. 리턴값 없으면 empty JSON 오브젝트 리턴
+#### 4. Object Return시 @Router의 defaultFactory에서 Response를 생성해 응답함.
 
 
 
-### Annotations
+
+## @Annotations
 #### @Router [클래스 레벨]
 라우터 클래스에 선언
+
+    Class<? extends ResponseFactory> defaultFactory() default JsonFactory.class
+    //해당 라우터에서 Object리턴시 지정된 Factory에서 Response생성후 응답    
+
+####cf. JsonFactory
+    public class JsonFactory implements ResponseFactory {
+        @Override
+    	public Response getResponse(Object returned) {
+    		return new Json(returned);
+    	}
+    }
+
 
 #### @When [클래스, 메서드 레벨]
 Url 매핑 정보를 정의
@@ -82,14 +89,14 @@ Url 매핑 정보를 정의
     String[] method() default "GET"; // 매핑될 메서드(Post, Get, Put, Delete등) 
 	
 ### Uri 변수의 사용
-	모든 파라미터를 받을때 {}와 *를 사용합니다.
-	@Mapping("/{valueName}/*");
-     *와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
-	http.getUriValue("valueName");
-	혹은 파라미터에 @UriValue("valueName") String uri로 사용가능합니다.
+모든 파라미터를 받을때 {}와 \*를 사용합니다.
 
-#### @HttpMethods [클래스 레벨]
-@HttpMethod메서드 클래스에 선언.
+\*와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
+
+	@Mapping("/{valueName}/*");
+	http.getUriValue("valueName");
+    @UriValue("valueName") String string;
+
 
 #### @HttpMethod [메서드 레벨]
 공통적으로 사용할 메서드 정의 @Before, @After에서 사용
@@ -98,7 +105,6 @@ Url 매핑 정보를 정의
     
 #### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored [파라미터 레벨]
 
-#### example
     @Before("loginCheck")
     @When(value = "/update", method = Method.POST)
     public void updatePost(@StringParameter("userId") String parameter,
@@ -136,7 +142,7 @@ Url 매핑 정보를 정의
     @When(value = "/api/upload")
     public class UploadController {
     
-        @Build
+        @Bind
     	DAO dao;
     
     	@When(value = "/profilePhoto", method = Methods.POST)
@@ -152,35 +158,10 @@ Url 매핑 정보를 정의
     }
 
 
-### Http.class Interface
-HttpImpl.class, HttpForTest.class
-HttpSevlet req와 resp의 Wrapper 클래스, 익셉션제거
-
-#### example
-    @When(method = Methods.GET, before="loginCheck")
-    public void getAnswers(Http http) {
-        http.forward("/index")
-    }
-    
-#### vs 직접 사용 하는 경우
-    @When(method = Methods.GET, before="loginCheck")
-    public void getAnswers(HttpServletRequest req, HttpServletResponse res) {
-        RequestDispatcher rd = req.getRequestDispatcher(path);
-    	try {
-			rd.forward(req, resp);
-		} catch (ServletException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-
 
 # Setting
 1. 아래 web.xml을 webapp디렉토리의 WEB-INF폴더 내에 위치.
 2. resource폴더 내에 next.json 위치 (기본 세팅을 담당)
-3. resource폴더 내에 build.json 위치 (빌드할 오브젝트 JsonFormat)
 
 ## web.xml (webapp/WEB-INF/web.xml)
     <?xml version="1.0" encoding="UTF-8"?>
@@ -196,12 +177,14 @@ HttpSevlet req와 resp의 Wrapper 클래스, 익셉션제거
 
 
 ## next-route.json (resources/next-route.json)
-### Setting
+### Setting Example
 	{
 	  "basePackage": "",
 	  "mappings": [
-	    "/api/*",
-	    "*.page"
+	    "/",
+        "!.css",
+        "!.html",
+        "!.js"
 	  ],
 	  "url": "localhost:8080",
 	  "jspPath": "/WEB-INF/jsp/"
@@ -220,11 +203,12 @@ HttpSevlet req와 resp의 Wrapper 클래스, 익셉션제거
 	  "upload": {
 	    "location": "uploads/",
 	    "tempSaveLocation": "uploads/temp/",
-	    //5MB = 1024*1024*5
-	    "maxFileSize": 5242880,
-	    //25MB = 1024*1024*5*5
-	    "maxRequestSize": 26214400,
-	    //1MB = 1024*1024
-	    "fileSizeThreshold": 1048576
+	    "maxFileSize": 5242880, //5MB
+	    "maxRequestSize": 26214400, //25MB
+	    "fileSizeThreshold": 1048576 //1MB
 	  }
 	}
+
+
+## cf. [bind를 통한 Dependency Inection](https://github.com/zerohouse/next-bind)
+## cf. [Jdbc-mysql Library](https://github.com/zerohouse/next-jdbc-mysql)

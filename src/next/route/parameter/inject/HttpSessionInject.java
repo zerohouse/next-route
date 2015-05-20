@@ -7,9 +7,7 @@ import javax.servlet.http.HttpSession;
 
 import next.route.http.Http;
 import next.route.http.Store;
-import next.route.parameter.annotation.ParameterInject;
 
-@ParameterInject
 public class HttpSessionInject implements Inject {
 
 	@Override

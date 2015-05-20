@@ -6,9 +6,7 @@ import next.route.exception.RequiredParamNullException;
 import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.annotation.JsonParameter;
-import next.route.parameter.annotation.ParameterInject;
 
-@ParameterInject
 public class JsonParameterInject implements Inject {
 
 	@Override

@@ -6,6 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+/**
+ * 
+ * HttpServletResponse, HttpServletRequest의 Wrapper클래스입니다.<br>
+ * Custom Uri에서 변수를 추출합니다.
+ * 
+ */
 public interface Http {
 
 	String getParameter(String name);

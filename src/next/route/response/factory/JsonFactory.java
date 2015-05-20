@@ -7,6 +7,8 @@ public class JsonFactory implements ResponseFactory {
 
 	@Override
 	public Response getResponse(Object returned) {
+		if (returned == null)
+			return new Json();
 		return new Json(returned);
 	}
 

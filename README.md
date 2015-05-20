@@ -27,10 +27,10 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
     @When("/api/user")
     @Before("loginCheck")
 	public class UserController {
-		@Build
+		@Bind
 		GDAO<User> userDAO;
 	
-		@Build(ImplementedBy=DeleteRight.class)
+		@Bind(ImplementedBy=DeleteRight.class)
 		Right right;
 		
 		@When(value = "/login", method = Methods.POST)

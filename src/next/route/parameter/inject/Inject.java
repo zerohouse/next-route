@@ -10,6 +10,4 @@ public interface Inject {
 
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws RequiredParamNullException;
 
-	public boolean matches(Class<?> type, Parameter obj);
-
 }

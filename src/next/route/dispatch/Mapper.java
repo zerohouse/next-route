@@ -14,8 +14,9 @@ import next.route.annotation.Router;
 import next.route.annotation.When;
 import next.route.http.Http;
 import next.route.http.Store;
+import next.route.parameter.CatchParamAnnotations;
+import next.route.parameter.CatchParamTypes;
 import next.route.parameter.ParameterMaker;
-import next.route.parameter.annotation.ParameterInject;
 import next.route.parameter.inject.FileParameterInject;
 import next.route.parameter.inject.HttpInject;
 import next.route.parameter.inject.HttpServletRequestInject;
@@ -46,7 +47,7 @@ public class Mapper {
 
 	Mapper() {
 		instancePool = new InstancePool(Setting.getMapping().getBasePackage());
-		instancePool.addClassAnnotations(Router.class, ParameterInject.class);
+		instancePool.addClassAnnotations(Router.class, CatchParamTypes.class, CatchParamAnnotations.class);
 		instancePool.addMethodAnnotations(When.class, HttpMethod.class);
 		instancePool.build();
 
@@ -62,7 +63,10 @@ public class Mapper {
 		set.add(new StoreInject());
 		set.add(new StringParameterInject());
 		set.add(new UriValueInject());
-		instancePool.getInstancesAnnotatedWith(ParameterInject.class).forEach(inject -> {
+		instancePool.getInstancesAnnotatedWith(CatchParamTypes.class).forEach(inject -> {
+			set.add((Inject) inject);
+		});
+		instancePool.getInstancesAnnotatedWith(CatchParamAnnotations.class).forEach(inject -> {
 			set.add((Inject) inject);
 		});
 

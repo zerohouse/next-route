@@ -1,13 +1,14 @@
 package next.route.parameter.inject;
 
-
 import java.lang.reflect.Parameter;
 
 import javax.servlet.http.HttpSession;
 
 import next.route.http.Http;
 import next.route.http.Store;
+import next.route.parameter.CatchParamTypes;
 
+@CatchParamTypes(HttpSession.class)
 public class HttpSessionInject implements Inject {
 
 	@Override
@@ -15,9 +16,4 @@ public class HttpSessionInject implements Inject {
 		return http.getReq().getSession();
 	}
 
-	@Override
-	public boolean matches(Class<?> type, Parameter obj) {
-		return type.equals(HttpSession.class);
-
-	}
 }

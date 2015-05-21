@@ -5,13 +5,15 @@ import java.lang.reflect.Parameter;
 import next.route.exception.RequiredParamNullException;
 import next.route.http.Http;
 import next.route.http.Store;
-import next.route.parameter.annotation.SessionAttribute;
+import next.route.parameter.CatchParamAnnotations;
+import next.route.parameter.annotation.SessionAttr;
 
+@CatchParamAnnotations(SessionAttr.class)
 public class SessionAttributeInject implements Inject {
 
 	@Override
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws RequiredParamNullException {
-		SessionAttribute session = obj.getAnnotation(SessionAttribute.class);
+		SessionAttr session = obj.getAnnotation(SessionAttr.class);
 		String name = session.value();
 		Object value = http.getSessionAttribute(Object.class, name);
 		if (session.require() && value == null)
@@ -19,8 +21,4 @@ public class SessionAttributeInject implements Inject {
 		return value;
 	}
 
-	@Override
-	public boolean matches(Class<?> type, Parameter obj) {
-		return obj.isAnnotationPresent(SessionAttribute.class);
-	}
 }

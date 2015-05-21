@@ -4,8 +4,10 @@ import java.lang.reflect.Parameter;
 
 import next.route.http.Http;
 import next.route.http.Store;
+import next.route.parameter.CatchParamAnnotations;
 import next.route.parameter.annotation.Stored;
 
+@CatchParamAnnotations(Stored.class)
 public class StoredInject implements Inject {
 
 	@Override
@@ -17,8 +19,4 @@ public class StoredInject implements Inject {
 		return store.get(stored.value());
 	}
 
-	@Override
-	public boolean matches(Class<?> type, Parameter obj) {
-		return obj.isAnnotationPresent(Stored.class);
-	}
 }

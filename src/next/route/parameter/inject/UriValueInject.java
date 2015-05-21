@@ -4,8 +4,10 @@ import java.lang.reflect.Parameter;
 
 import next.route.http.Http;
 import next.route.http.Store;
+import next.route.parameter.CatchParamAnnotations;
 import next.route.parameter.annotation.UriValue;
 
+@CatchParamAnnotations(UriValue.class)
 public class UriValueInject implements Inject {
 
 	@Override
@@ -13,8 +15,4 @@ public class UriValueInject implements Inject {
 		return http.getUriValue(obj.getAnnotation(UriValue.class).value());
 	}
 
-	@Override
-	public boolean matches(Class<?> type, Parameter obj) {
-		return obj.isAnnotationPresent(UriValue.class);
-	}
 }

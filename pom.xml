@@ -11,8 +11,8 @@
 	
 	<repositories>
 		<repository>
-			<id>next-mvn-repo</id>
-			<url>https://raw.github.com/zerohouse/next/mvn-repo/</url>
+			<id>next-bind-mvn-repo</id>
+			<url>https://raw.github.com/zerohouse/next-bind/mvn-repo/</url>
 		</repository>
 	</repositories>
 

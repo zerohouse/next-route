@@ -23,7 +23,7 @@ public class Json implements Response {
 		this.obj = object;
 	}
 
-	public void setJsonObj(Object jsonObj) {
+	public void setObject(Object jsonObj) {
 		this.obj = jsonObj;
 	}
 

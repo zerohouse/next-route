@@ -64,6 +64,7 @@ public class Mapper {
 	}
 
 	private void makeHandlerMap() {
+		logger.info("\n");
 		instancePool.getInstancesAnnotatedWith(Handle.class).forEach(handler -> {
 			Class<? extends Exception>[] handleExceptions = handler.getClass().getAnnotation(Handle.class).value();
 			for (int i = 0; i < handleExceptions.length; i++) {

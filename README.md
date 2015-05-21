@@ -21,7 +21,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 
 #MVC
 
-## Example Usage
+### Example Usage
 
     @Router
     @When("/api/user")
@@ -64,36 +64,54 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 #### 4. Object Return시 @Router의 defaultFactory에서 Response를 생성해 응답함.
 
 
+#### cf. Object리턴시 임의의 응답을 보내기 위해서는?
 
-
-## @Annotations
-#### @Router [클래스 레벨]
-라우터 클래스에 선언
-
-    Class<? extends ResponseFactory> defaultFactory() default JsonFactory.class
-    //해당 라우터에서 Object리턴시 지정된 Factory에서 Response생성후 응답    
-
-####cf. JsonFactory
+-> ReponseFactory를 Implements하는 클래스를 @Router의 defaultFactory로 지정.
+#### example) JsonFactory(default)
     public class JsonFactory implements ResponseFactory {
         @Override
-    	public Response getResponse(Object returned) {
+        public Response getResponse(Object returned) {
     		return new Json(returned);
     	}
     }
 
 
-#### @When [클래스, 메서드 레벨]
+
+
+
+## @Annotations
+### @Router [클래스 레벨]
+라우터 클래스에 선언
+
+    Class<? extends ResponseFactory> defaultFactory() default JsonFactory.class
+    //해당 라우터에서 Object리턴시 지정된 Factory에서 Response생성후 응답    
+
+
+
+### @When [클래스, 메서드 레벨]
 Url 매핑 정보를 정의
 
     String[] value() default ""; // 매핑될 url들 ({}, *)
     String[] method() default "GET"; // 매핑될 메서드(Post, Get, Put, Delete등) 
+    
+    
+    
+#### cf. Uri 변수의 사용
+모든 파라미터를 받을때 {}와 \*를 사용합니다.
+
+\*와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
+
+    @Mapping("/{valueName}/*");
+    http.getUriValue("valueName");
+    @UriValue("valueName") String string;
+
 	
-#### @HttpMethod [메서드 레벨]
+### @HttpMethod [메서드 레벨]
 공통적으로 사용할 메서드 정의 @Before, @After에서 사용
 
     String value() default ""; // 매핑될 이름 값이 없으면 메서드 이름으로 매핑
     
-#### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored, @UriValue [파라미터 레벨]
+### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored, @UriValue [파라미터 레벨]
 
     @Before("loginCheck")
     @When(value = "/update", method = Method.POST)
@@ -104,7 +122,7 @@ Url 매핑 정보를 정의
               //Store store를 꺼내 저장한 속성을 뺄 수 있음.
     }
     
-### @CatchParamTypes, @CatchParamAnnotations: 임의의 파라미터를 inject 하고자 할 경우 
+### @CatchParamTypes, @CatchParamAnnotations: 임의의 파라미터를 inject 하고자 할 경우 [클래스 레벨]
 #### @CatchParamTypes({Type1.class, Type2.class, ...})
 #### @CatchParamAnnotations({annotation1.class, annotation2.class, ...})
 
@@ -127,19 +145,9 @@ Url 매핑 정보를 정의
     }
 
     
-
-### Uri 변수의 사용
-모든 파라미터를 받을때 {}와 \*를 사용합니다.
-
-\*와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
-
-    @Mapping("/{valueName}/*");
-	http.getUriValue("valueName");
-    @UriValue("valueName") String string;
-
     
 
-### @Handle : Exception 처리
+### @Handle : Exception 처리 [클래스 레벨]
 처리할 익셥선 클래스를 등록하면 익셉션 발생시 해당 메서드가 캐치
     
     @Handle(SessionNullException.class)
@@ -182,8 +190,8 @@ Url 매핑 정보를 정의
 
 
 # Setting
-1. 아래 web.xml을 webapp디렉토리의 WEB-INF폴더 내에 위치.
-2. resource폴더 내에 next.json 위치 (기본 세팅을 담당)
+1. 아래 web.xml을 webapp디렉토리의 WEB-INF폴더 내에 위치. (리스너 클래스 등록)
+2. resource폴더 내에 next-route.json 위치 (기본 세팅을 담당)
 
 ## web.xml (webapp/WEB-INF/web.xml)
     <?xml version="1.0" encoding="UTF-8"?>
@@ -232,5 +240,5 @@ Url 매핑 정보를 정의
 	}
 
 
-## cf. [bind를 통한 Dependency Inection](https://github.com/zerohouse/next-bind)
-## cf. [Jdbc-mysql Library](https://github.com/zerohouse/next-jdbc-mysql)
+## cf. bind를 통한 D.I [next-bind](https://github.com/zerohouse/next-bind)
+## cf. 한줄에 끝내는 JDBC [next-jdbc-mysql](https://github.com/zerohouse/next-jdbc-mysql)

@@ -12,7 +12,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
     </repository>
 
 ###Dependency
-	<dependency>
+    <dependency>
 		<groupId>at.begin</groupId>
 		<artifactId>next-route</artifactId>
 		<version>0.0.1</version>
@@ -88,22 +88,12 @@ Url 매핑 정보를 정의
     String[] value() default ""; // 매핑될 url들 ({}, *)
     String[] method() default "GET"; // 매핑될 메서드(Post, Get, Put, Delete등) 
 	
-### Uri 변수의 사용
-모든 파라미터를 받을때 {}와 \*를 사용합니다.
-
-\*와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
-
-	@Mapping("/{valueName}/*");
-	http.getUriValue("valueName");
-    @UriValue("valueName") String string;
-
-
 #### @HttpMethod [메서드 레벨]
 공통적으로 사용할 메서드 정의 @Before, @After에서 사용
 
     String value() default ""; // 매핑될 이름 값이 없으면 메서드 이름으로 매핑
     
-#### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored [파라미터 레벨]
+#### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored, @UriValue [파라미터 레벨]
 
     @Before("loginCheck")
     @When(value = "/update", method = Method.POST)
@@ -114,18 +104,50 @@ Url 매핑 정보를 정의
               //Store store를 꺼내 저장한 속성을 뺄 수 있음.
     }
     
-#### 임의의 파라미터를 inject 하고자 할 경우 파라미터 Inject를 임플리먼트한 클래스를 생성
-    @ParameterInject
-    public class HttpInject implements Inject {
+### @CatchParamTypes, @CatchParamAnnotations: 임의의 파라미터를 inject 하고자 할 경우 
+#### @CatchParamTypes({Type1.class, Type2.class, ...})
+#### @CatchParamAnnotations({annotation1.class, annotation2.class, ...})
+
+    @CatchParamTypes(User.class)
+    public class CatchUser implements Inject {
     
         @Override
-    	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
-    		return http;
+        public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws SessionNullException {
+    		User user = http.getSessionAttribute(User.class, "user");
+    		if (user == null)
+    			throw new SessionNullException();
+    		return http.getSessionAttribute("user");
     	}
     
-    	@Override
-    	public boolean matches(Class<?> type, Parameter obj) {
-    		return type.equals(Http.class);
+    }
+    
+    @When("/api/users")
+    public void updatePost(User User) {
+        user // --> getParameter의 유저.
+    }
+
+    
+
+### Uri 변수의 사용
+모든 파라미터를 받을때 {}와 \*를 사용합니다.
+
+\*와 {}의 차이점은 변수를 꺼낼 수 있느냐의 여부입니다.
+
+    @Mapping("/{valueName}/*");
+	http.getUriValue("valueName");
+    @UriValue("valueName") String string;
+
+    
+
+### @Handle : Exception 처리
+처리할 익셥선 클래스를 등록하면 익셉션 발생시 해당 메서드가 캐치
+    
+    @Handle(SessionNullException.class)
+    public class SessionNullExceptionHandler implements ExceptionHandler {
+    
+        @Override
+    	public void handle(Http http, Exception e) {
+    		new Json("세션이 만료되었습니다.").render(http);
     	}
     
     }

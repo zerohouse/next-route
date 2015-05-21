@@ -7,17 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  * 세션 Object를 사용합니다.<br>
- * require일 경우, 해당 오브젝트가 없으면 에러를 발생시킵니다.
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface SessionAttr {
-	public static final String SESSION_NULL = "세션이 만료되었거나 잘못된 접근입니다.";
 
 	String value();
 
-	boolean require() default true;
-
-	String messageWhenNull() default SESSION_NULL;
 }

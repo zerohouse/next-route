@@ -3,8 +3,6 @@ package next.route.dispatch;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import next.route.exception.RequiredParamNullException;
-
 public class MethodWrapper {
 
 	private Object instance;
@@ -19,8 +17,7 @@ public class MethodWrapper {
 		return method;
 	}
 
-	public Object execute(Object[] parameterArray) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			RequiredParamNullException {
+	public Object execute(Object[] parameterArray) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		return method.invoke(instance, parameterArray);
 	}
 

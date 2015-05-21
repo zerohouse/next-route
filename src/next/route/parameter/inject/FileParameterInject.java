@@ -4,7 +4,6 @@ import java.lang.reflect.Parameter;
 
 import javax.servlet.http.Part;
 
-import next.route.exception.RequiredParamNullException;
 import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.CatchParamAnnotations;
@@ -15,7 +14,7 @@ import next.route.parameter.annotation.FileParam;
 public class FileParameterInject implements Inject {
 
 	@Override
-	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws RequiredParamNullException {
+	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
 		FileParam param = obj.getAnnotation(FileParam.class);
 		String name = param.value();
 		Object value = null;
@@ -23,8 +22,6 @@ public class FileParameterInject implements Inject {
 			value = new UploadFile(http.getPart(name));
 		else if (type.equals(Part.class))
 			value = http.getPart(name);
-		if (param.require() && value == null)
-			throw new RequiredParamNullException(param.messageWhenNull());
 		return value;
 	}
 

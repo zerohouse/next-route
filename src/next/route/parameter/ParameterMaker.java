@@ -23,7 +23,7 @@ public class ParameterMaker {
 		if (obj.getAnnotations().length == 0)
 			inject = typeParameters.get(type);
 		else
-			inject = annotationParameters.get(obj.getAnnotations()[0]);
+			inject = annotationParameters.get(obj.getAnnotations()[0].annotationType());
 		if (inject == null)
 			return null;
 		return inject.getParameter(http, store, type, obj);

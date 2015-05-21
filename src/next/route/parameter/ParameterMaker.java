@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import next.route.exception.RequiredParamNullException;
 import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.inject.Inject;
@@ -18,7 +17,7 @@ public class ParameterMaker {
 	private Map<Class<?>, Inject> typeParameters;
 	private Map<Class<? extends Annotation>, Inject> annotationParameters;
 
-	private Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws RequiredParamNullException {
+	private Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws Exception {
 		Inject inject;
 		if (obj.getAnnotations().length == 0)
 			inject = typeParameters.get(type);
@@ -29,7 +28,7 @@ public class ParameterMaker {
 		return inject.getParameter(http, store, type, obj);
 	}
 
-	public Object[] getParamArray(Http http, Method method, Store store) throws RequiredParamNullException {
+	public Object[] getParamArray(Http http, Method method, Store store) throws Exception {
 		Class<?>[] types = method.getParameterTypes();
 		Parameter[] obj = method.getParameters();
 		List<Object> parameters = new ArrayList<Object>();

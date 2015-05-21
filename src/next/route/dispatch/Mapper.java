@@ -7,11 +7,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import next.bind.InstancePool;
 import next.route.annotation.HttpMethod;
 import next.route.annotation.Router;
 import next.route.annotation.When;
+import next.route.exception.ExceptionHandler;
+import next.route.exception.Handle;
 import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.CatchParamAnnotations;
@@ -40,6 +43,7 @@ public class Mapper {
 	private static final Logger logger = LoggerFactory.getLogger(Mapper.class);
 
 	private Map<String, MethodWrapper> methodMap;
+	private Map<Class<? extends Exception>, ExceptionHandler> handlerMap;
 	private UriMap uriMap;
 
 	private InstancePool instancePool;
@@ -47,10 +51,32 @@ public class Mapper {
 
 	Mapper() {
 		instancePool = new InstancePool(Setting.getMapping().getBasePackage());
-		instancePool.addClassAnnotations(Router.class, CatchParamTypes.class, CatchParamAnnotations.class);
+		instancePool.addClassAnnotations(Router.class, CatchParamTypes.class, CatchParamAnnotations.class, Handle.class);
 		instancePool.addMethodAnnotations(When.class, HttpMethod.class);
 		instancePool.build();
+		parameterMaker = new ParameterMaker(injectSet());
+		methodMap = new HashMap<String, MethodWrapper>();
+		uriMap = new UriMap();
+		handlerMap = new ConcurrentHashMap<Class<? extends Exception>, ExceptionHandler>();
+		makeMethodMap();
+		makeUriMap();
+		makeHandlerMap();
+	}
 
+	private void makeHandlerMap() {
+		instancePool.getInstancesAnnotatedWith(Handle.class).forEach(handler -> {
+			Class<? extends Exception>[] handleExceptions = handler.getClass().getAnnotation(Handle.class).value();
+			for (int i = 0; i < handleExceptions.length; i++) {
+				if (!ExceptionHandler.class.isAssignableFrom(handler.getClass())) {
+					logger.warn(String.format("%s 클래스가 Handler interface를 implement하지 않아 익셉션을 처리할 수 없습니다.", handler.getClass().getSimpleName()));
+					continue;
+				}
+				handlerMap.put(handleExceptions[i], (ExceptionHandler) handler);
+			}
+		});
+	}
+
+	private Set<Inject> injectSet() {
 		Set<Inject> set = new HashSet<Inject>();
 		set.add(new FileParameterInject());
 		set.add(new HttpInject());
@@ -64,18 +90,20 @@ public class Mapper {
 		set.add(new StringParameterInject());
 		set.add(new UriValueInject());
 		instancePool.getInstancesAnnotatedWith(CatchParamTypes.class).forEach(inject -> {
+			if (!Inject.class.isAssignableFrom(inject.getClass())) {
+				logger.warn(String.format("%s 클래스가 Inject interface를 implement하지 않아 파라미터를 생성할 수 없습니다.", inject.getClass().getSimpleName()));
+				return;
+			}
 			set.add((Inject) inject);
 		});
 		instancePool.getInstancesAnnotatedWith(CatchParamAnnotations.class).forEach(inject -> {
+			if (!Inject.class.isAssignableFrom(inject.getClass())) {
+				logger.warn(String.format("%s 클래스가 Inject interface를 implement하지 않아 파라미터를 생성할 수 없습니다.", inject.getClass().getSimpleName()));
+				return;
+			}
 			set.add((Inject) inject);
 		});
-
-		parameterMaker = new ParameterMaker(set);
-
-		methodMap = new HashMap<String, MethodWrapper>();
-		uriMap = new UriMap();
-		makeMethodMap();
-		makeUriMap();
+		return set;
 	}
 
 	private void makeMethodMap() {
@@ -161,6 +189,11 @@ public class Mapper {
 			}
 			methods.getResponse(null).render(http);
 		} catch (Exception e) {
+			ExceptionHandler eh = handlerMap.get(e.getClass());
+			if (eh != null) {
+				eh.handle(http, e);
+				return;
+			}
 			methods.getResponse(e.getMessage()).render(http);
 		}
 	}

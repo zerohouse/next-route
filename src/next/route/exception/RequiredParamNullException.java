@@ -1,6 +1,5 @@
 package next.route.exception;
 
-
 public class RequiredParamNullException extends Exception {
 
 	private static final long serialVersionUID = -4487155408774219634L;
@@ -8,6 +7,5 @@ public class RequiredParamNullException extends Exception {
 	public RequiredParamNullException(String message) {
 		super(message);
 	}
-
 
 }

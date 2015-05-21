@@ -71,7 +71,7 @@ public class Mapper {
 					logger.warn(String.format("%s 클래스가 Handler interface를 implement하지 않아 익셉션을 처리할 수 없습니다.", handler.getClass().getSimpleName()));
 					continue;
 				}
-				logger.info(String.format("%s 익셉션을 %s 핸들러가 처리합니다."), handleExceptions[i].getSimpleName(), handler.getClass().getSimpleName());
+				logger.info(String.format("%s 익셉션을 %s 핸들러가 처리합니다.", handleExceptions[i].getSimpleName(), handler.getClass().getSimpleName()));
 				handlerMap.put(handleExceptions[i], (ExceptionHandler) handler);
 			}
 		});

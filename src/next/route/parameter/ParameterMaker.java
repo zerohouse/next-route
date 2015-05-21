@@ -9,11 +9,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.inject.Inject;
 
 public class ParameterMaker {
+	private static final Logger logger = LoggerFactory.getLogger(ParameterMaker.class);
+
 	private Map<Class<?>, Inject> typeParameters;
 	private Map<Class<? extends Annotation>, Inject> annotationParameters;
 
@@ -39,18 +44,24 @@ public class ParameterMaker {
 	}
 
 	public ParameterMaker(Set<Inject> injects) {
+		logger.info("\n");
+		logger.info("파라미터 Inejctor를 등록합니다.");
 		typeParameters = new ConcurrentHashMap<Class<?>, Inject>();
 		annotationParameters = new ConcurrentHashMap<Class<? extends Annotation>, Inject>();
 		injects.forEach(inject -> {
 			if (inject.getClass().isAnnotationPresent(CatchParamAnnotations.class)) {
 				Class<? extends Annotation>[] annotations = inject.getClass().getAnnotation(CatchParamAnnotations.class).value();
-				for (int i = 0; i < annotations.length; i++)
+				for (int i = 0; i < annotations.length; i++) {
 					annotationParameters.put(annotations[i], inject);
+					logger.info(String.format("%s 어노테이션은 %s Injector가 처리합니다.", annotations[i].getSimpleName(), inject.getClass().getSimpleName()));
+				}
 			}
 			if (inject.getClass().isAnnotationPresent(CatchParamTypes.class)) {
 				Class<?>[] types = inject.getClass().getAnnotation(CatchParamTypes.class).value();
-				for (int i = 0; i < types.length; i++)
+				for (int i = 0; i < types.length; i++) {
 					typeParameters.put(types[i], inject);
+					logger.info(String.format("%s 타입은 %s Injector가 처리합니다.", types[i].getSimpleName(), inject.getClass().getSimpleName()));
+				}
 			}
 		});
 	}

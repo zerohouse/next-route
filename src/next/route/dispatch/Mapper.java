@@ -163,11 +163,11 @@ public class Mapper {
 
 	public void execute(UriKey url, Http http) {
 		Methods methods = uriMap.get(url, http);
-		Queue<MethodWrapper> methodList = methods.getMethodList();
-		if (methodList == null) {
+		if (methods == null) {
 			http.sendError(404);
 			return;
 		}
+		Queue<MethodWrapper> methodList = methods.getMethodList();
 		logger.debug(String.format("%s -> %s", url, methodList.toString()));
 		Iterator<MethodWrapper> miter = methodList.iterator();
 		Store store = new Store(); // 생각을 좀 해봅시다..ㅇㅅㅇ;;

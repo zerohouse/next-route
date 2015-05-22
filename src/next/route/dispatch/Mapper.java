@@ -65,6 +65,7 @@ public class Mapper {
 
 	private void makeHandlerMap() {
 		logger.info("\n");
+		logger.info("\n Exception Handler를 등록합니다.");
 		instancePool.getInstancesAnnotatedWith(Handle.class).forEach(handler -> {
 			Class<? extends Exception>[] handleExceptions = handler.getClass().getAnnotation(Handle.class).value();
 			for (int i = 0; i < handleExceptions.length; i++) {
@@ -72,7 +73,7 @@ public class Mapper {
 					logger.warn(String.format("%s 클래스가 Handler interface를 implement하지 않아 익셉션을 처리할 수 없습니다.", handler.getClass().getSimpleName()));
 					continue;
 				}
-				logger.info(String.format("%s 익셉션을 %s 핸들러가 처리합니다.", handleExceptions[i].getSimpleName(), handler.getClass().getSimpleName()));
+				logger.info(String.format("%s Exception을 %s 핸들러가 처리합니다.", handleExceptions[i].getSimpleName(), handler.getClass().getSimpleName()));
 				handlerMap.put(handleExceptions[i], (ExceptionHandler) handler);
 			}
 		});

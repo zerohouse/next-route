@@ -12,6 +12,9 @@ public class UriValueInject implements Inject {
 
 	@Override
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
+		String value = obj.getAnnotation(UriValue.class).value();
+		if ("".equals(value))
+			return http.getUriValue();
 		return http.getUriValue(obj.getAnnotation(UriValue.class).value());
 	}
 

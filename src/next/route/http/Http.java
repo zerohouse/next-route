@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,10 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import next.route.setting.Setting;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import next.route.setting.Setting;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -26,7 +28,8 @@ public class Http {
 
 	private HttpServletRequest req;
 	private HttpServletResponse resp;
-	private Map<String, String> uriValues;
+	private Map<String, String> uriValueMap;
+	private Queue<String> uriValueQue;
 
 	public String getParameter(String name) {
 		return req.getParameter(name);
@@ -92,15 +95,24 @@ public class Http {
 	}
 
 	public void putUriValue(String key, String uriVariable) {
-		if (uriValues == null)
-			uriValues = new HashMap<String, String>();
-		uriValues.put(key, uriVariable);
+		if (uriValueMap == null)
+			uriValueMap = new HashMap<String, String>();
+		uriValueMap.put(key, uriVariable);
+		if (uriValueQue == null)
+			uriValueQue = new LinkedList<String>();
+		uriValueQue.add(uriVariable);
 	}
 
 	public String getUriValue(String key) {
-		if (uriValues == null)
+		if (uriValueMap == null)
 			return null;
-		return uriValues.get(key);
+		return uriValueMap.get(key);
+	}
+	
+	public String getUriValue() {
+		if (uriValueQue == null)
+			return null;
+		return uriValueQue.poll();
 	}
 
 	public void setCharacterEncoding(String encording) {
@@ -172,9 +184,9 @@ public class Http {
 	}
 
 	public int getUriValueSize() {
-		if (uriValues == null)
+		if (uriValueMap == null)
 			return 0;
-		return uriValues.size();
+		return uriValueMap.size();
 	}
 
 	public Collection<Part> getParts() {

@@ -11,11 +11,13 @@ import java.lang.annotation.Target;
  * &#064;UriVariable("variableName") String uriVariable <br>
  * 처럼 사용가능합니다.
  * 
+ * variableName이 없을경우, 순서대로 Uri값을 가져옵니다.
+ * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface UriValue {
 
-	String value();
+	String value() default "";
 
 }

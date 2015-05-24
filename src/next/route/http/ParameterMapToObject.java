@@ -5,7 +5,12 @@ import java.util.Map;
 
 import next.bind.MakeInstance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ParameterMapToObject {
+
+	private static final Logger logger = LoggerFactory.getLogger(ParameterMapToObject.class);
 
 	public <T> T makeFromParameter(Map<String, String[]> parameterMap, Class<T> type) {
 		T obj = MakeInstance.make(type);
@@ -15,6 +20,7 @@ public class ParameterMapToObject {
 				field.setAccessible(true);
 				field.set(obj, parseFromString(field.getType(), value[0]));
 			} catch (Exception e) {
+				logger.debug(e.getMessage());
 			}
 		});
 		return obj;

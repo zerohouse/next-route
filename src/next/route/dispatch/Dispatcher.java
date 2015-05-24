@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import next.route.http.Http;
-import next.route.http.HttpImpl;
 import next.route.setting.Setting;
 
 public class Dispatcher extends HttpServlet {
@@ -20,7 +19,7 @@ public class Dispatcher extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Http http = new HttpImpl(req, resp);
+		Http http = new Http(req, resp);
 		String encording = Setting.getMapping().getCharacterEncoding();
 		if (encording != null && !"".equals(encording))
 			http.setCharacterEncoding(encording);

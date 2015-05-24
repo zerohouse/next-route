@@ -1,67 +1,203 @@
 package next.route.http;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-/**
- * 
- * HttpServletResponse, HttpServletRequest의 Wrapper클래스입니다.<br>
- * Custom Uri에서 변수를 추출합니다.
- * 
- */
-public interface Http {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	String getParameter(String name);
+import next.route.setting.Setting;
 
-	<T> T getJsonObject(Class<T> cLass, String name);
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-	<T> T getJsonObject(Class<T> cLass);
+public class Http {
 
-	void forword(String path);
+	private final static Logger logger = LoggerFactory.getLogger(Http.class);
 
-	void setContentType(String type);
+	private HttpServletRequest req;
+	private HttpServletResponse resp;
+	private Map<String, String> uriValues;
 
-	void write(String string);
+	public String getParameter(String name) {
+		return req.getParameter(name);
+	}
 
-	void putUriValue(String key, String uriVariable);
+	public HttpServletRequest getReq() {
+		return req;
+	}
 
-	String getUriValue(String key);
+	public HttpServletResponse getResp() {
+		return resp;
+	}
 
-	void setCharacterEncoding(String encording);
+	public <T> T getJsonObject(Class<T> cLass, String name) {
+		Gson gson = Setting.getGson();
+		try {
+			return gson.fromJson(req.getParameter(name), cLass);
+		} catch (JsonSyntaxException e) {
+			logger.warn(e.getMessage());
+			return null;
+		}
+	}
 
-	void sendNotFound();
+	// [TODO]중복코드 수정
+	public <T> T getJsonObject(Class<T> cLass) {
+		Gson gson = Setting.getGson();
+		try {
+			return gson.fromJson(gson.toJson(req.getParameterMap()), cLass);
+		} catch (JsonSyntaxException e) {
+			logger.warn(e.getMessage());
+			return null;
+		}
+	}
 
-	void setSessionAttribute(String name, Object value);
+	public Http(HttpServletRequest req, HttpServletResponse resp) {
+		this.req = req;
+		this.resp = resp;
+	}
 
-	void removeSessionAttribute(String name);
+	public void forword(String path) {
+		if (path.equals(""))
+			sendError(508);
+		RequestDispatcher rd = req.getRequestDispatcher(path);
+		try {
+			rd.forward(req, resp);
+		} catch (ServletException e) {
+			logger.warn(e.getMessage());
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
+		}
+	}
 
-	<T> T getSessionAttribute(Class<T> cLass, String name);
+	public void setContentType(String type) {
+		resp.setContentType(type);
+	}
 
-	Object getSessionAttribute(String name);
+	public void write(String string) {
+		try {
+			resp.getWriter().write(string);
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
+		}
+	}
 
-	void sendRedirect(String location);
+	public void putUriValue(String key, String uriVariable) {
+		if (uriValues == null)
+			uriValues = new HashMap<String, String>();
+		uriValues.put(key, uriVariable);
+	}
 
-	void sendError(int errorNo);
+	public String getUriValue(String key) {
+		if (uriValues == null)
+			return null;
+		return uriValues.get(key);
+	}
 
-	void sendError(int errorNo, String errorMesage);
+	public void setCharacterEncoding(String encording) {
+		try {
+			req.setCharacterEncoding(encording);
+			resp.setCharacterEncoding(encording);
+		} catch (UnsupportedEncodingException e) {
+			logger.warn(e.getMessage());
+		}
+	}
 
-	void setAttribute(String key, Object value);
+	public void sendNotFound() {
+		try {
+			resp.sendError(404, req.getRequestURI());
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
+		}
+	}
 
-	Object getAttribute(String key);
+	public void setSessionAttribute(String name, Object value) {
+		req.getSession().setAttribute(name, value);
+	}
 
-	HttpServletRequest getReq();
+	public void removeSessionAttribute(String name) {
+		req.getSession().removeAttribute(name);
+	}
 
-	HttpServletResponse getResp();
+	@SuppressWarnings("unchecked")
+	public <T> T getSessionAttribute(Class<T> cLass, String name) {
+		return (T) req.getSession().getAttribute(name);
+	}
 
-	int getUriValueSize();
+	public Object getSessionAttribute(String name) {
+		return req.getSession().getAttribute(name);
+	}
 
-	Part getPart(String name);
+	public void sendRedirect(String location) {
+		if (location.equals(""))
+			sendError(508);
+		try {
+			resp.sendRedirect(location);
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
+		}
+	}
 
-	Collection<Part> getParts();
+	public void sendError(int errorNo) {
+		try {
+			resp.sendError(errorNo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-	<T> T getObjectFromParameterMap(Class<T> type);
+	public void sendError(int errorNo, String errorMesage) {
+		try {
+			resp.sendError(errorNo, errorMesage);
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
+		}
+	}
+
+	public void setAttribute(String key, Object value) {
+		req.setAttribute(key, value);
+	}
+
+	public Object getAttribute(String key) {
+		return req.getAttribute(key);
+	}
+
+	public int getUriValueSize() {
+		if (uriValues == null)
+			return 0;
+		return uriValues.size();
+	}
+
+	public Collection<Part> getParts() {
+		try {
+			return req.getParts();
+		} catch (IOException | ServletException e) {
+			logger.warn(e.getMessage());
+		}
+		return null;
+	}
+
+	public Part getPart(String name) {
+		try {
+			return req.getPart(name);
+		} catch (IOException | ServletException e) {
+			logger.warn(e.getMessage());
+		}
+		return null;
+	}
+
+	public <T> T getObjectFromParameterMap(Class<T> type) {
+		ParameterMapToObject parser = new ParameterMapToObject();
+		return parser.makeFromParameter(req.getParameterMap(), type);
+	}
 
 }

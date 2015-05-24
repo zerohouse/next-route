@@ -54,6 +54,7 @@ public class HttpImpl implements Http {
 		}
 	}
 
+	// [TODO]중복코드 수정
 	@Override
 	public <T> T getJsonObject(Class<T> cLass) {
 		Gson gson = Setting.getGson();

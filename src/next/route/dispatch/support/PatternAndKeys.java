@@ -29,7 +29,7 @@ public class PatternAndKeys {
 				keys.add(matcher.group(j));
 			}
 		}
-		String regex = uri.replaceAll(REGEX, "(.*?)");
+		String regex = uri.replaceAll(REGEX, "(\\w*?)");
 		pattern = Pattern.compile(regex);
 	}
 

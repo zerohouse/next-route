@@ -15,7 +15,6 @@ public class ParameterMapToObject {
 				field.setAccessible(true);
 				field.set(obj, parseFromString(field.getType(), value[0]));
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		});
 		return obj;

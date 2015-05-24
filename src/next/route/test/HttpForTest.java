@@ -189,4 +189,11 @@ public class HttpForTest implements Http {
 		return null;
 	}
 
+	@Override
+	public <T> T getObjectFromParameterMap(Class<T> type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }

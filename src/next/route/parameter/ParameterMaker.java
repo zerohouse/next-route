@@ -15,12 +15,14 @@ import org.slf4j.LoggerFactory;
 import next.route.http.Http;
 import next.route.http.Store;
 import next.route.parameter.inject.Inject;
+import next.route.parameter.inject.ParseInject;
 
 public class ParameterMaker {
 	private static final Logger logger = LoggerFactory.getLogger(ParameterMaker.class);
 
 	private Map<Class<?>, Inject> typeParameters;
 	private Map<Class<? extends Annotation>, Inject> annotationParameters;
+	private Inject defaultParameter;
 
 	private Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws Exception {
 		Inject inject;
@@ -29,7 +31,7 @@ public class ParameterMaker {
 		else
 			inject = annotationParameters.get(obj.getAnnotations()[0].annotationType());
 		if (inject == null)
-			return null;
+			return defaultParameter.getParameter(http, store, type, obj);
 		return inject.getParameter(http, store, type, obj);
 	}
 
@@ -48,6 +50,7 @@ public class ParameterMaker {
 		logger.info("파라미터 Inejctor를 등록합니다.");
 		typeParameters = new ConcurrentHashMap<Class<?>, Inject>();
 		annotationParameters = new ConcurrentHashMap<Class<? extends Annotation>, Inject>();
+		defaultParameter = new ParseInject();
 		injects.forEach(inject -> {
 			if (inject.getClass().isAnnotationPresent(CatchParamAnnotations.class)) {
 				Class<? extends Annotation>[] annotations = inject.getClass().getAnnotation(CatchParamAnnotations.class).value();

@@ -218,4 +218,10 @@ public class HttpImpl implements Http {
 		return null;
 	}
 
+	@Override
+	public <T> T getObjectFromParameterMap(Class<T> type) {
+		ParameterMapToObject parser = new ParameterMapToObject();
+		return parser.makeFromParameter(req.getParameterMap(), type);
+	}
+
 }

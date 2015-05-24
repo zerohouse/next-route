@@ -62,4 +62,6 @@ public interface Http {
 
 	Collection<Part> getParts();
 
+	<T> T getObjectFromParameterMap(Class<T> type);
+
 }

@@ -14,6 +14,8 @@ public class JsonParameterInject implements Inject {
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
 		JsonParam jparam = obj.getAnnotation(JsonParam.class);
 		String name = jparam.value();
+		if (name.equals(""))
+			name = obj.getName();
 		Object value = http.getJsonObject(type, name);
 		return value;
 	}

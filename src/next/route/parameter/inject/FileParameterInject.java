@@ -17,6 +17,8 @@ public class FileParameterInject implements Inject {
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
 		FileParam param = obj.getAnnotation(FileParam.class);
 		String name = param.value();
+		if (name.equals(""))
+			name = obj.getName();
 		Object value = null;
 		if (type.equals(UploadFile.class))
 			value = new UploadFile(http.getPart(name));

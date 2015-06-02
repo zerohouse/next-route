@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 public @interface JsonParam {
 
-	String value();
+	String value() default "";
 
 }

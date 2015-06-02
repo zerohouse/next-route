@@ -14,6 +14,8 @@ public class SessionAttributeInject implements Inject {
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
 		SessionAttr session = obj.getAnnotation(SessionAttr.class);
 		String name = session.value();
+		if (name.equals(""))
+			name = obj.getName();
 		Object value = http.getSessionAttribute(Object.class, name);
 		return value;
 	}

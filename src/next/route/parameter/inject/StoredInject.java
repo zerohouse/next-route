@@ -13,10 +13,12 @@ public class StoredInject implements Inject {
 	@Override
 	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
 		Stored stored = obj.getAnnotation(Stored.class);
-		if (stored.value().equals("")) {
+		if (!stored.value().equals(""))
+			return store.get(stored.value());
+		Object result = store.get(obj.getName());
+		if (result == null)
 			return store.get(type);
-		}
-		return store.get(stored.value());
+		return result;
 	}
 
 }

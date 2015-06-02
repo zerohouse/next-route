@@ -117,7 +117,7 @@
 				<version>3.3</version>
 				<configuration>
 					<compilerArgument>
-						-parameter
+						-parameters
 					</compilerArgument>
 					<!-- or whatever version you use -->
 					<source>1.8</source>

@@ -16,19 +16,24 @@ import next.route.annotation.When;
 import next.route.exception.ExceptionHandler;
 import next.route.exception.Handle;
 import next.route.http.Http;
+import next.route.parameter.CatchDefault;
 import next.route.parameter.CatchParamAnnotations;
 import next.route.parameter.CatchParamTypes;
 import next.route.parameter.ParameterMaker;
-import next.route.parameter.inject.FileParameterInject;
-import next.route.parameter.inject.HttpInject;
-import next.route.parameter.inject.HttpServletRequestInject;
-import next.route.parameter.inject.HttpServletResponseInject;
-import next.route.parameter.inject.HttpSessionInject;
 import next.route.parameter.inject.Inject;
-import next.route.parameter.inject.JsonParameterInject;
-import next.route.parameter.inject.SessionAttributeInject;
-import next.route.parameter.inject.StringParameterInject;
-import next.route.parameter.inject.UriValueInject;
+import next.route.parameter.inject.annotation.FileParameterInject;
+import next.route.parameter.inject.annotation.JsonParameterInject;
+import next.route.parameter.inject.annotation.ParamParameterInject;
+import next.route.parameter.inject.annotation.ParseInject;
+import next.route.parameter.inject.annotation.ReqAttributeInject;
+import next.route.parameter.inject.annotation.SessionAttributeInject;
+import next.route.parameter.inject.annotation.UriValueInject;
+import next.route.parameter.type.HttpInject;
+import next.route.parameter.type.HttpServletRequestInject;
+import next.route.parameter.type.HttpServletResponseInject;
+import next.route.parameter.type.HttpSessionInject;
+import next.route.parameter.type.StringInject;
+import next.route.parameter.type.UploadFileInject;
 import next.route.response.Response;
 import next.route.setting.Setting;
 
@@ -48,10 +53,11 @@ public class Mapper {
 
 	Mapper() {
 		instancePool = new InstancePool(Setting.getMapping().getBasePackage());
-		instancePool.addClassAnnotations(Router.class, CatchParamTypes.class, CatchParamAnnotations.class, Handle.class);
+		instancePool.addClassAnnotations(Router.class, CatchParamTypes.class, CatchParamAnnotations.class, CatchDefault.class, Handle.class);
 		instancePool.addMethodAnnotations(When.class, HttpMethod.class);
 		instancePool.build();
 		parameterMaker = new ParameterMaker(injectSet());
+		parameterMaker.setDefaultParameter(instancePool.getInstancesAnnotatedWith(CatchDefault.class));
 		methodMap = new HashMap<String, MethodWrapper>();
 		uriMap = new UriMap();
 		handlerMap = new ConcurrentHashMap<Class<? extends Exception>, ExceptionHandler>();
@@ -79,14 +85,19 @@ public class Mapper {
 	private Set<Inject> injectSet() {
 		Set<Inject> set = new HashSet<Inject>();
 		set.add(new FileParameterInject());
+		set.add(new JsonParameterInject());
+		set.add(new ParamParameterInject());
+		set.add(new ParseInject());
+		set.add(new ReqAttributeInject());
+		set.add(new SessionAttributeInject());
+		set.add(new UriValueInject());
+		
 		set.add(new HttpInject());
 		set.add(new HttpServletRequestInject());
 		set.add(new HttpServletResponseInject());
 		set.add(new HttpSessionInject());
-		set.add(new JsonParameterInject());
-		set.add(new SessionAttributeInject());
-		set.add(new StringParameterInject());
-		set.add(new UriValueInject());
+		set.add(new StringInject());
+		set.add(new UploadFileInject());
 		instancePool.getInstancesAnnotatedWith(CatchParamTypes.class).forEach(inject -> {
 			if (!Inject.class.isAssignableFrom(inject.getClass())) {
 				logger.warn(String.format("%s 클래스가 Inject interface를 implement하지 않아 파라미터를 생성할 수 없습니다.", inject.getClass().getSimpleName()));

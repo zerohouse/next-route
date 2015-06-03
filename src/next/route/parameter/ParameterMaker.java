@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import next.route.http.Http;
 import next.route.parameter.inject.Inject;
-import next.route.parameter.inject.ParseInject;
+import next.route.parameter.inject.annotation.ParseInject;
 
 public class ParameterMaker {
 	private static final Logger logger = LoggerFactory.getLogger(ParameterMaker.class);
@@ -49,7 +50,6 @@ public class ParameterMaker {
 		logger.info("파라미터 Inejctor를 등록합니다.");
 		typeParameters = new ConcurrentHashMap<Class<?>, Inject>();
 		annotationParameters = new ConcurrentHashMap<Class<? extends Annotation>, Inject>();
-		defaultParameter = new ParseInject();
 		injects.forEach(inject -> {
 			if (inject.getClass().isAnnotationPresent(CatchParamAnnotations.class)) {
 				Class<? extends Annotation>[] annotations = inject.getClass().getAnnotation(CatchParamAnnotations.class).value();
@@ -66,5 +66,18 @@ public class ParameterMaker {
 				}
 			}
 		});
+		logger.info(String.format("그외 모든 타입은 %s Injector가 처리합니다.", defaultParameter.getClass().getSimpleName()));
+	}
+
+	public void setDefaultParameter(Set<Object> set) {
+		Iterator<Object> iter = set.iterator();
+		while (iter.hasNext()) {
+			Object obj = iter.next();
+			if (Inject.class.isAssignableFrom(obj.getClass()))
+				this.defaultParameter = (Inject) obj;
+		}
+		if (this.defaultParameter != null)
+			return;
+		this.defaultParameter = new ParseInject();
 	}
 }

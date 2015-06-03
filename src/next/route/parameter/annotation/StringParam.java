@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Store에 저장된 Object를 꺼냅니다. <br>
- * Store.put(Object)또는 <br>
- * Store.put(key ,Object)를 통해 저장합니다.
+ * request의 파라미터를 사용합니다.<br>
+ * String으로 사용합니다.<br>
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface Stored {
+public @interface StringParam {
 
 	String value() default "";
+
 }

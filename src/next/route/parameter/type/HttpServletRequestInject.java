@@ -1,4 +1,4 @@
-package next.route.parameter.inject;
+package next.route.parameter.type;
 
 import java.lang.reflect.Parameter;
 
@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import next.route.http.Http;
 import next.route.parameter.CatchParamTypes;
+import next.route.parameter.inject.Inject;
 
 @CatchParamTypes(HttpServletRequest.class)
 public class HttpServletRequestInject implements Inject {

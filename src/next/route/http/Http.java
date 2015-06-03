@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -29,7 +27,6 @@ public class Http {
 	private HttpServletRequest req;
 	private HttpServletResponse resp;
 	private Map<String, String> uriValueMap;
-	private Queue<String> uriValueQue;
 
 	public String getParameter(String name) {
 		return req.getParameter(name);
@@ -98,21 +95,12 @@ public class Http {
 		if (uriValueMap == null)
 			uriValueMap = new HashMap<String, String>();
 		uriValueMap.put(key, uriVariable);
-		if (uriValueQue == null)
-			uriValueQue = new LinkedList<String>();
-		uriValueQue.add(uriVariable);
 	}
 
 	public String getUriValue(String key) {
 		if (uriValueMap == null)
 			return null;
 		return uriValueMap.get(key);
-	}
-	
-	public String getUriValue() {
-		if (uriValueQue == null)
-			return null;
-		return uriValueQue.poll();
 	}
 
 	public void setCharacterEncoding(String encording) {

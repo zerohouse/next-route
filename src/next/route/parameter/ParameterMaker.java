@@ -25,14 +25,21 @@ public class ParameterMaker {
 	private Inject defaultParameter;
 
 	private Object getParameter(Http http, Class<?> type, Parameter obj) throws Exception {
-		Inject inject;
-		if (obj.getAnnotations().length == 0)
-			inject = typeParameters.get(type);
-		else
-			inject = annotationParameters.get(obj.getAnnotations()[0].annotationType());
+		Inject inject = findMatched(obj.getAnnotations());
 		if (inject == null)
-			return defaultParameter.getParameter(http, type, obj);
+			inject = typeParameters.get(type);
+		if (inject == null)
+			inject = defaultParameter;
 		return inject.getParameter(http, type, obj);
+	}
+
+	private Inject findMatched(Annotation[] annotations) {
+		for (int i = 0; i < annotations.length; i++) {
+			Inject inject = annotationParameters.get(annotations[i].annotationType());
+			if (inject != null)
+				return inject;
+		}
+		return null;
 	}
 
 	public Object[] getParamArray(Http http, Method method) throws Exception {

@@ -13,7 +13,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 
 ###Dependency
     <dependency>
-		<groupId>at.begin</groupId>
+    	<groupId>at.begin</groupId>
 		<artifactId>next-route</artifactId>
 		<version>0.0.3</version>
 	</dependency>
@@ -35,7 +35,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 		
 		@When(value = "/login", method = Methods.POST)
         @Before("!loginCheck")
-		public Response login(@JsonParameter("user") User user, HttpSession session) {
+		public Response login(@JsonParam @Optional User user, HttpSession session) {
 			User fromDB = userDao.find(user.getEmail());
 			if (fromDB == null)
 				return new Json(true, "가입하지 않은 이메일입니다.", null);
@@ -111,26 +111,27 @@ Url 매핑 정보를 정의
 
     String value() default ""; // 매핑될 이름 값이 없으면 메서드 이름으로 매핑
     
-### @StringParameter, @FileParameter, @JsonParameter, @SessionAttribute, @Stored, @UriValue [파라미터 레벨]
+### @StringParam, @FileParam, @JsonParam, @SessionAttr, @UriValue [파라미터 레벨]
+1. value를 지정하지 않으면 parameter name으로 매핑
+2. @Optional 어노테이션이 없을경우, 파라미터가 없을시 ParamNullException 발생
 
     @Before("loginCheck")
     @When(value = "/update", method = Method.POST)
-    public void updatePost(@StringParameter("userId") String parameter,
-              @JsonParameter("Post") Post post,
-              @SessionAttribute("user") User user, @Stored List<String> mylist) {
-              //Stored의 경우
-              //Store store를 꺼내 저장한 속성을 뺄 수 있음.
+    public void updatePost(@StringParam String parameter,
+              @JsonParam("Post") @Optional Post post,
+              @SessionAttribute User user) {
     }
     
 ### @CatchParamTypes, @CatchParamAnnotations: 임의의 파라미터를 inject 하고자 할 경우 [클래스 레벨]
 #### @CatchParamTypes({Type1.class, Type2.class, ...})
 #### @CatchParamAnnotations({annotation1.class, annotation2.class, ...})
+#### @CatchDefefault
 
     @CatchParamTypes(User.class)
     public class CatchUser implements Inject {
     
         @Override
-        public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws SessionNullException {
+        public Object getParameter(Http http, Class<?> type, Parameter obj) throws SessionNullException {
     		User user = http.getSessionAttribute(User.class, "user");
     		if (user == null)
     			throw new SessionNullException();
@@ -176,8 +177,7 @@ Url 매핑 정보를 정의
     	DAO dao;
     
     	@When(value = "/profilePhoto", method = Methods.POST)
-    	public Object profile(@SessionAttribute("user") User user,
-            @FileParameter("photo") UploadFile file) throws IOException {
+    	public Object profile(@SessionAttribute User user, UploadFile file) throws IOException {
     		file.setFileName("profile_" + user.getEmail().replace('@', '_'));
     		user.setPhotoUrl(file.getUriPath());
     		file.save();

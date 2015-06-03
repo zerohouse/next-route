@@ -13,7 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import next.route.exception.ParamNullException;
 import next.route.http.Http;
+import next.route.parameter.annotation.Optional;
 import next.route.parameter.inject.Inject;
 import next.route.parameter.inject.annotation.ParseInject;
 
@@ -47,7 +49,13 @@ public class ParameterMaker {
 		Parameter[] obj = method.getParameters();
 		List<Object> parameters = new ArrayList<Object>();
 		for (int i = 0; i < obj.length; i++) {
-			parameters.add(getParameter(http, types[i], obj[i]));
+			Object param = getParameter(http, types[i], obj[i]);
+			if (param != null) {
+				parameters.add(param);
+				continue;
+			}
+			if (!obj[i].isAnnotationPresent(Optional.class))
+				throw new ParamNullException();
 		}
 		return parameters.toArray();
 	}

@@ -73,7 +73,6 @@ public class ParameterMaker {
 				}
 			}
 		});
-		logger.info(String.format("그외 모든 타입은 %s Injector가 처리합니다.", defaultParameter.getClass().getSimpleName()));
 	}
 
 	public void setDefaultParameter(Set<Object> set) {
@@ -86,5 +85,6 @@ public class ParameterMaker {
 		if (this.defaultParameter != null)
 			return;
 		this.defaultParameter = new ParseInject();
+		logger.info(String.format("그외 모든 타입은 %s Injector가 처리합니다.", defaultParameter.getClass().getSimpleName()));
 	}
 }

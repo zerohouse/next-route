@@ -16,7 +16,6 @@ import next.route.annotation.When;
 import next.route.exception.ExceptionHandler;
 import next.route.exception.Handle;
 import next.route.http.Http;
-import next.route.http.Store;
 import next.route.parameter.CatchParamAnnotations;
 import next.route.parameter.CatchParamTypes;
 import next.route.parameter.ParameterMaker;
@@ -28,8 +27,6 @@ import next.route.parameter.inject.HttpSessionInject;
 import next.route.parameter.inject.Inject;
 import next.route.parameter.inject.JsonParameterInject;
 import next.route.parameter.inject.SessionAttributeInject;
-import next.route.parameter.inject.StoreInject;
-import next.route.parameter.inject.StoredInject;
 import next.route.parameter.inject.StringParameterInject;
 import next.route.parameter.inject.UriValueInject;
 import next.route.response.Response;
@@ -88,8 +85,6 @@ public class Mapper {
 		set.add(new HttpSessionInject());
 		set.add(new JsonParameterInject());
 		set.add(new SessionAttributeInject());
-		set.add(new StoredInject());
-		set.add(new StoreInject());
 		set.add(new StringParameterInject());
 		set.add(new UriValueInject());
 		instancePool.getInstancesAnnotatedWith(CatchParamTypes.class).forEach(inject -> {
@@ -171,11 +166,10 @@ public class Mapper {
 		Queue<MethodWrapper> methodList = methods.getMethodList();
 		logger.debug(String.format("%s -> %s", url, methodList.toString()));
 		Iterator<MethodWrapper> miter = methodList.iterator();
-		Store store = new Store(); // 생각을 좀 해봅시다..ㅇㅅㅇ;;
 		try {
 			while (miter.hasNext()) {
 				MethodWrapper mw = miter.next();
-				Object returned = mw.execute(parameterMaker.getParamArray(http, mw.getMethod(), store));
+				Object returned = mw.execute(parameterMaker.getParamArray(http, mw.getMethod()));
 
 				if (returned == null)
 					continue;

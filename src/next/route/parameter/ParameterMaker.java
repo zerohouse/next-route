@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import next.route.http.Http;
-import next.route.http.Store;
 import next.route.parameter.inject.Inject;
 import next.route.parameter.inject.ParseInject;
 
@@ -24,23 +23,23 @@ public class ParameterMaker {
 	private Map<Class<? extends Annotation>, Inject> annotationParameters;
 	private Inject defaultParameter;
 
-	private Object getParameter(Http http, Store store, Class<?> type, Parameter obj) throws Exception {
+	private Object getParameter(Http http, Class<?> type, Parameter obj) throws Exception {
 		Inject inject;
 		if (obj.getAnnotations().length == 0)
 			inject = typeParameters.get(type);
 		else
 			inject = annotationParameters.get(obj.getAnnotations()[0].annotationType());
 		if (inject == null)
-			return defaultParameter.getParameter(http, store, type, obj);
-		return inject.getParameter(http, store, type, obj);
+			return defaultParameter.getParameter(http, type, obj);
+		return inject.getParameter(http, type, obj);
 	}
 
-	public Object[] getParamArray(Http http, Method method, Store store) throws Exception {
+	public Object[] getParamArray(Http http, Method method) throws Exception {
 		Class<?>[] types = method.getParameterTypes();
 		Parameter[] obj = method.getParameters();
 		List<Object> parameters = new ArrayList<Object>();
 		for (int i = 0; i < obj.length; i++) {
-			parameters.add(getParameter(http, store, types[i], obj[i]));
+			parameters.add(getParameter(http, types[i], obj[i]));
 		}
 		return parameters.toArray();
 	}

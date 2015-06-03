@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>at.begin</groupId>
 	<artifactId>next-route</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.3</version>
 	<packaging>jar</packaging>
 	<properties>
 		<github.global.server>github</github.global.server>
@@ -95,7 +95,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifestEntries>
-							<Application-Version>0.0.1</Application-Version>
+							<Application-Version>0.0.3</Application-Version>
 							<Built-By>zerohouse</Built-By>
 						</manifestEntries>
 						<addMavenDescriptor>false</addMavenDescriptor>

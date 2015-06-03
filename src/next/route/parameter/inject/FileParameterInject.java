@@ -5,7 +5,6 @@ import java.lang.reflect.Parameter;
 import javax.servlet.http.Part;
 
 import next.route.http.Http;
-import next.route.http.Store;
 import next.route.parameter.CatchParamAnnotations;
 import next.route.parameter.UploadFile;
 import next.route.parameter.annotation.FileParam;
@@ -14,7 +13,7 @@ import next.route.parameter.annotation.FileParam;
 public class FileParameterInject implements Inject {
 
 	@Override
-	public Object getParameter(Http http, Store store, Class<?> type, Parameter obj) {
+	public Object getParameter(Http http, Class<?> type, Parameter obj) {
 		FileParam param = obj.getAnnotation(FileParam.class);
 		String name = param.value();
 		if (name.equals(""))

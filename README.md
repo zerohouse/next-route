@@ -1,4 +1,4 @@
-# Next Route Library 0.0.1 (MVC)
+# Next Route Library 0.0.3 (MVC)
 편합니다!
 
 
@@ -15,7 +15,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
     <dependency>
 		<groupId>at.begin</groupId>
 		<artifactId>next-route</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.3</version>
 	</dependency>
 
 

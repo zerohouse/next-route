@@ -91,7 +91,7 @@ public class Mapper {
 		set.add(new ReqAttributeInject());
 		set.add(new SessionAttributeInject());
 		set.add(new UriValueInject());
-		
+
 		set.add(new HttpInject());
 		set.add(new HttpServletRequestInject());
 		set.add(new HttpServletResponseInject());
@@ -160,7 +160,7 @@ public class Mapper {
 		for (int i = 0; i < prefix.length; i++)
 			for (int j = 0; j < mapping.method().length; j++)
 				for (int k = 0; k < mapping.value().length; k++) {
-					String method = mapping.method()[j];
+					String method = mapping.method()[j].toString();
 					String uri = prefix[i] + mapping.value()[k];
 					UriKey urikey = new UriKey(method, uri);
 					uriMap.put(urikey, methods);

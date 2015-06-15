@@ -1,8 +1,16 @@
 package next.route;
 
-public class Methods {
-	public static final String POST = "POST";
-	public static final String GET = "GET";
-	public static final String DELETE = "DELETE";
-	public static final String PUT = "PUT";
+public enum Methods {
+	POST("POST"), GET("GET"), DELETE("DELETE"), PUT("PUT");
+
+	private String value;
+
+	private Methods(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return value;
+	}
 }

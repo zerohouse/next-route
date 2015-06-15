@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import next.route.Methods;
+
 /**
  * 
  * 해당 메소드, 혹은 클래슬르 Uri와 매핑합니다.<br>
@@ -24,5 +26,5 @@ import java.lang.annotation.Target;
 public @interface When {
 	String[] value() default "";
 
-	String[] method() default "GET";
+	Methods[] method() default Methods.GET;
 }

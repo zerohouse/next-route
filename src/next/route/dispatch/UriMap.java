@@ -13,19 +13,19 @@ import next.route.http.Http;
 
 public class UriMap {
 
-	private Map<UriKey, Methods> uriMap;
+	private Map<UriKey, MethodQueue> uriMap;
 	private Map<String, Queue<PatternAndKeys>> regexMap;
-	private Map<PatternAndKeys, Methods> patternMap;
+	private Map<PatternAndKeys, MethodQueue> patternMap;
 	private final Pattern pattern;
 
 	public UriMap() {
-		uriMap = new ConcurrentHashMap<UriKey, Methods>();
+		uriMap = new ConcurrentHashMap<UriKey, MethodQueue>();
 		regexMap = new ConcurrentHashMap<String, Queue<PatternAndKeys>>();
-		patternMap = new ConcurrentHashMap<PatternAndKeys, Methods>();
+		patternMap = new ConcurrentHashMap<PatternAndKeys, MethodQueue>();
 		pattern = Pattern.compile(PatternAndKeys.REGEX);
 	}
 
-	public void put(UriKey key, Methods Methods) {
+	public void put(UriKey key, MethodQueue Methods) {
 		Matcher matcher = pattern.matcher(key.getUri());
 		if (!key.getUri().contains("*") && !matcher.find()) {
 			uriMap.put(key, Methods);
@@ -41,8 +41,8 @@ public class UriMap {
 		patternMap.put(pak, Methods);
 	}
 
-	public Methods get(UriKey key, Http http) {
-		Methods methods = uriMap.get(key);
+	public MethodQueue get(UriKey key, Http http) {
+		MethodQueue methods = uriMap.get(key);
 		if (methods != null)
 			return methods;
 		Queue<PatternAndKeys> regexList = regexMap.get(key.getMethod());

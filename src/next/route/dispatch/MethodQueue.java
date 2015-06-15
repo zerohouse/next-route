@@ -15,21 +15,21 @@ import next.route.response.factory.ResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Methods {
+public class MethodQueue {
 
 	@Override
 	public String toString() {
 		return methodList.toString();
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(Methods.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodQueue.class);
 
 	Queue<MethodWrapper> methodList;
 	Map<String, MethodWrapper> methodMap;
 	InstancePool instancePool;
 	ResponseFactory factory;
 
-	public Methods(Method m, Map<String, MethodWrapper> methodMap, InstancePool instancePool) {
+	public MethodQueue(Method m, Map<String, MethodWrapper> methodMap, InstancePool instancePool) {
 		this.methodMap = methodMap;
 		this.instancePool = instancePool;
 		this.methodList = new ConcurrentLinkedQueue<MethodWrapper>();

@@ -150,7 +150,7 @@ public class Mapper {
 	private void methodMapping(Method m) {
 		Class<?> declaringClass = m.getDeclaringClass();
 		String[] prefix;
-		Methods methods = new Methods(m, methodMap, instancePool);
+		MethodQueue methods = new MethodQueue(m, methodMap, instancePool);
 		if (declaringClass.isAnnotationPresent(When.class)) {
 			prefix = declaringClass.getAnnotation(When.class).value();
 		} else {
@@ -169,7 +169,7 @@ public class Mapper {
 	}
 
 	public void execute(UriKey url, Http http) {
-		Methods methods = uriMap.get(url, http);
+		MethodQueue methods = uriMap.get(url, http);
 		if (methods == null) {
 			http.sendError(404);
 			return;

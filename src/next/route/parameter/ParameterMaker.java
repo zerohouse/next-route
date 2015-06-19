@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import next.route.exception.ParamNullException;
+import next.bind.MakeInstance;
 import next.route.http.Http;
 import next.route.parameter.annotation.Require;
 import next.route.parameter.inject.Inject;
@@ -55,7 +55,7 @@ public class ParameterMaker {
 				continue;
 			}
 			if (obj[i].isAnnotationPresent(Require.class))
-				throw new ParamNullException();
+				throw MakeInstance.make(obj[i].getAnnotation(Require.class).value());
 		}
 		return parameters.toArray();
 	}

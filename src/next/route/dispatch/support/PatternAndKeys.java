@@ -22,18 +22,18 @@ public class PatternAndKeys {
 
 	public PatternAndKeys(String uri) {
 		keys = new ConcurrentLinkedQueue<String>();
-		if (uri.matches("^(?:\\*).(\\w*)$")) {
-			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(\\w*)$", "(?:.*).$1"));
+		if (uri.matches("^(?:\\*).(\\S*)$")) {
+			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(\\S*)$", "(?:.*).$1"));
 			return;
 		}
-		uri = uri.replace("*", "(?:\\w*?)");
+		uri = uri.replace("*", "(?:\\S*?)");
 		Matcher matcher = REGEXPattern.matcher(uri);
 		while (matcher.find()) {
 			for (int j = 1; j < matcher.groupCount() + 1; j++) {
 				keys.add(matcher.group(j));
 			}
 		}
-		String regex = uri.replaceAll(REGEX, "(\\\\w*?)");
+		String regex = uri.replaceAll(REGEX, "(\\\\S*?)");
 		pattern = Pattern.compile(regex);
 	}
 

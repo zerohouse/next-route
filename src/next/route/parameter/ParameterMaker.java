@@ -50,12 +50,12 @@ public class ParameterMaker {
 		List<Object> parameters = new ArrayList<Object>();
 		for (int i = 0; i < obj.length; i++) {
 			Object param = getParameter(http, types[i], obj[i]);
-			if (param != null) {
-				parameters.add(param);
+			parameters.add(param);
+			if (param != null)
 				continue;
-			}
 			if (obj[i].isAnnotationPresent(Require.class))
 				throw MakeInstance.make(obj[i].getAnnotation(Require.class).value());
+
 		}
 		return parameters.toArray();
 	}

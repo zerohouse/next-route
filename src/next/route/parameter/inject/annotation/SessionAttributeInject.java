@@ -16,7 +16,7 @@ public class SessionAttributeInject implements Inject {
 		String name = session.value();
 		if (name.equals(""))
 			name = obj.getName();
-		return http.getSessionAttribute(Object.class, name);
+		return http.getSessionAttribute(name);
 	}
 
 }

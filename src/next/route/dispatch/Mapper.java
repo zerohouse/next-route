@@ -203,6 +203,7 @@ public class Mapper {
 				return;
 			}
 			methods.getResponse(e.getMessage()).render(http);
+			e.printStackTrace();
 		}
 	}
 

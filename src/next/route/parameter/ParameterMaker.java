@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import next.route.exception.ParamNullException;
 import next.route.http.Http;
-import next.route.parameter.annotation.Optional;
+import next.route.parameter.annotation.Require;
 import next.route.parameter.inject.Inject;
 import next.route.parameter.inject.annotation.ParseInject;
 
@@ -54,7 +54,7 @@ public class ParameterMaker {
 				parameters.add(param);
 				continue;
 			}
-			if (!obj[i].isAnnotationPresent(Optional.class))
+			if (obj[i].isAnnotationPresent(Require.class))
 				throw new ParamNullException();
 		}
 		return parameters.toArray();

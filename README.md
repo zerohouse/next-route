@@ -35,7 +35,7 @@ pom.xml에 아래의 레파지토리와 Dependency설정을 추가합니다.
 		
 		@When(value = "/login", method = Methods.POST)
         @Before("!loginCheck")
-		public Response login(@JsonParam @Optional User user, HttpSession session) {
+		public Response login(@JsonParam @Require User user, HttpSession session) {
 			User fromDB = userDao.find(user.getEmail());
 			if (fromDB == null)
 				return new Json(true, "가입하지 않은 이메일입니다.", null);
@@ -113,12 +113,12 @@ Url 매핑 정보를 정의
     
 ### @StringParam, @FileParam, @JsonParam, @SessionAttr, @UriValue [파라미터 레벨]
 1. value를 지정하지 않으면 parameter name으로 매핑
-2. @Optional 어노테이션이 없을경우, 파라미터가 없을시 ParamNullException 발생
+2. @Require 어노테이션이 있을경우, 파라미터가 없을시 ParamNullException 발생
 
     @Before("loginCheck")
     @When(value = "/update", method = Method.POST)
     public void updatePost(@StringParam String parameter,
-              @JsonParam("Post") @Optional Post post,
+              @JsonParam("Post") @Require Post post,
               @SessionAttribute User user) {
     }
     

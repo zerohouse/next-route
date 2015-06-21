@@ -11,7 +11,7 @@ public class LongInject implements Inject {
 
 	@Override
 	public Object getParameter(Http http, Class<?> type, Parameter obj) throws Exception {
-		return Long.parseLong(http.getUriValue(obj.getName()));
+		return Long.parseLong(http.getParameter(obj.getName()));
 	}
 
 }

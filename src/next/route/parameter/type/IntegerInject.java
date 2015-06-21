@@ -11,7 +11,7 @@ public class IntegerInject implements Inject {
 
 	@Override
 	public Object getParameter(Http http, Class<?> type, Parameter obj) throws Exception {
-		return Integer.parseInt(http.getUriValue(obj.getName()));
+		return Integer.parseInt(http.getParameter(obj.getName()));
 	}
 
 }

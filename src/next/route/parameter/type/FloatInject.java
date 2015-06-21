@@ -11,7 +11,7 @@ public class FloatInject implements Inject {
 
 	@Override
 	public Object getParameter(Http http, Class<?> type, Parameter obj) throws Exception {
-		return Float.parseFloat(http.getUriValue(obj.getName()));
+		return Float.parseFloat(http.getParameter(obj.getName()));
 	}
 
 }

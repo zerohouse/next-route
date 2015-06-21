@@ -11,7 +11,7 @@ public class DoubleInject implements Inject {
 
 	@Override
 	public Object getParameter(Http http, Class<?> type, Parameter obj) throws Exception {
-		return Double.parseDouble(http.getUriValue(obj.getName()));
+		return Double.parseDouble(http.getParameter(obj.getName()));
 	}
 
 }

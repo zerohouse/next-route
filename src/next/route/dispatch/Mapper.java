@@ -28,10 +28,14 @@ import next.route.parameter.inject.annotation.ParseInject;
 import next.route.parameter.inject.annotation.ReqAttributeInject;
 import next.route.parameter.inject.annotation.SessionAttributeInject;
 import next.route.parameter.inject.annotation.UriValueInject;
+import next.route.parameter.type.DoubleInject;
+import next.route.parameter.type.FloatInject;
 import next.route.parameter.type.HttpInject;
 import next.route.parameter.type.HttpServletRequestInject;
 import next.route.parameter.type.HttpServletResponseInject;
 import next.route.parameter.type.HttpSessionInject;
+import next.route.parameter.type.IntegerInject;
+import next.route.parameter.type.LongInject;
 import next.route.parameter.type.StringInject;
 import next.route.parameter.type.UploadFileInject;
 import next.route.response.Response;
@@ -97,6 +101,10 @@ public class Mapper {
 		set.add(new HttpServletResponseInject());
 		set.add(new HttpSessionInject());
 		set.add(new StringInject());
+		set.add(new LongInject());
+		set.add(new DoubleInject());
+		set.add(new FloatInject());
+		set.add(new IntegerInject());
 		set.add(new UploadFileInject());
 		instancePool.getInstancesAnnotatedWith(CatchParamTypes.class).forEach(inject -> {
 			if (!Inject.class.isAssignableFrom(inject.getClass())) {

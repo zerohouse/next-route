@@ -10,6 +10,7 @@ import next.route.http.Http;
 
 public class PatternAndKeys {
 
+	private static final String ALL_CHARACTER = "[^/^.]+";
 	private Pattern pattern;
 	private static final Pattern REGEXPattern;
 	public static final String REGEX = "\\{(.*?)\\}";
@@ -22,18 +23,18 @@ public class PatternAndKeys {
 
 	public PatternAndKeys(String uri) {
 		keys = new ConcurrentLinkedQueue<String>();
-		if (uri.matches("^(?:\\*).(\\S*)$")) {
-			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(\\S*)$", "(?:.*).$1"));
+		if (uri.matches("^(?:\\*).(" + ALL_CHARACTER + ")$")) {
+			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(" + ALL_CHARACTER + ")$", "(?:.*).$1"));
 			return;
 		}
-		uri = uri.replace("*", "(?:\\S*?)");
+		uri = uri.replace("*", "(?:" + ALL_CHARACTER + ")");
 		Matcher matcher = REGEXPattern.matcher(uri);
 		while (matcher.find()) {
 			for (int j = 1; j < matcher.groupCount() + 1; j++) {
 				keys.add(matcher.group(j));
 			}
 		}
-		String regex = uri.replaceAll(REGEX, "(\\\\S*?)");
+		String regex = uri.replaceAll(REGEX, "(" + ALL_CHARACTER + ")");
 		pattern = Pattern.compile(regex);
 	}
 

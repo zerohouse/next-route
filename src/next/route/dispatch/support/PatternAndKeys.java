@@ -10,7 +10,8 @@ import next.route.http.Http;
 
 public class PatternAndKeys {
 
-	private static final String ALL_CHARACTER = "[^/^.]+";
+	private static final String CHARACTERS = "[^/^.]+";
+	private static final String ALL_CHARACTER = "\\S*+";
 	private Pattern pattern;
 	private static final Pattern REGEXPattern;
 	public static final String REGEX = "\\{(.*?)\\}";
@@ -23,18 +24,19 @@ public class PatternAndKeys {
 
 	public PatternAndKeys(String uri) {
 		keys = new ConcurrentLinkedQueue<String>();
-		if (uri.matches("^(?:\\*).(" + ALL_CHARACTER + ")$")) {
-			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(" + ALL_CHARACTER + ")$", "(?:.*).$1"));
+		if (uri.matches("^(?:\\*).(" + CHARACTERS + ")$")) {
+			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(" + CHARACTERS + ")$", "(?:.*).$1"));
 			return;
 		}
-		uri = uri.replace("*", "(?:" + ALL_CHARACTER + ")");
+		uri = uri.replace("**", "(?:" + ALL_CHARACTER + ")");
+		uri = uri.replace("*", "(?:" + CHARACTERS + ")");
 		Matcher matcher = REGEXPattern.matcher(uri);
 		while (matcher.find()) {
 			for (int j = 1; j < matcher.groupCount() + 1; j++) {
 				keys.add(matcher.group(j));
 			}
 		}
-		String regex = uri.replaceAll(REGEX, "(" + ALL_CHARACTER + ")");
+		String regex = uri.replaceAll(REGEX, "(" + CHARACTERS + ")");
 		pattern = Pattern.compile(regex);
 	}
 

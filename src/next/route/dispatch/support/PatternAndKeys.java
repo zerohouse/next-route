@@ -11,7 +11,6 @@ import next.route.http.Http;
 public class PatternAndKeys {
 
 	private static final String CHARACTERS = "[^/^.]+";
-	private static final String ALL_CHARACTER = "\\S*+";
 	private Pattern pattern;
 	private static final Pattern REGEXPattern;
 	public static final String REGEX = "\\{(.*?)\\}";
@@ -28,7 +27,6 @@ public class PatternAndKeys {
 			pattern = Pattern.compile(uri.replaceFirst("^(?:\\*).(" + CHARACTERS + ")$", "(?:.*).$1"));
 			return;
 		}
-		uri = uri.replace("**", "(?:" + ALL_CHARACTER + ")");
 		uri = uri.replace("*", "(?:" + CHARACTERS + ")");
 		Matcher matcher = REGEXPattern.matcher(uri);
 		while (matcher.find()) {
